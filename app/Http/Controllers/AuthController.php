@@ -2,8 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -14,13 +21,13 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'signup', 'index']]);
     }
 
     /**
      * Get a JWT via given credentials.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function login()
     {
@@ -36,7 +43,7 @@ class AuthController extends Controller
     /**
      * Get the authenticated User.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function me()
     {
@@ -46,7 +53,7 @@ class AuthController extends Controller
     /**
      * Log the user out (Invalidate the token).
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function logout()
     {
@@ -58,7 +65,7 @@ class AuthController extends Controller
     /**
      * Refresh a token.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function refresh()
     {
@@ -66,11 +73,54 @@ class AuthController extends Controller
     }
 
     /**
+     * Get the authenticated User.
+     *
+     * @return JsonResponse
+     */
+    public function signup(Request $request)
+    {
+        $validator = Validator::make( $request->all(), [
+            'email' => 'required|unique:users|max:255',
+            'name' => 'required',
+            'password' => ['required', 'confirmed', Password::defaults()]
+        ]);
+
+        $user_row = new User([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        try {
+            $user_row->save();
+
+            return $this->login($request);
+
+//            return response()->json([
+//                'result'=>'Saved new user - '.$request->name
+//            ], 201);
+
+        } catch (Throwable $e) {
+
+            return response()->json(['error'=>$e->getMessage()], 500);
+        }
+    }
+
+
+    public function index()
+    {
+        $users = User::get();
+
+        return response()->json(['data'=>$users]);
+    }
+
+
+    /**
      * Get the token array structure.
      *
      * @param  string $token
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     protected function respondWithToken($token)
     {
