@@ -10,10 +10,9 @@ import {routes} from "./routes";
 
 const router = new VueRouter({
     routes,
+    mode: 'history'
 })
 
-
-alert('some alert')
 
 const app = new Vue({
     el: '#app',
