@@ -27,7 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         Password::defaults( function () {
             $rule = Password::min(6);
 
-            return $this->app-> isProduction()
+            return $this->app->isProduction()
                 ? $rule->mixedCase()->numbers()
                 : $rule;
         });

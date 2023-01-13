@@ -34,7 +34,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Email or password is wrong', 'credentials' => print_r($credentials)], 401);
         }
 
         return $this->respondWithToken($token);
@@ -79,26 +79,45 @@ class AuthController extends Controller
      */
     public function signup(Request $request)
     {
-        $validator = Validator::make( $request->all(), [
-            'email' => 'required|unique:users|max:255',
-            'name' => 'required',
-            'password' => ['required', 'confirmed', Password::defaults()]
-        ]);
+        $new_id= User::all('id')->count() + 1;
+        $request['email'] = $new_id . $request->email;
 
-        $user_row = new User([
-            'name' => $request->name,
+        $validator = Validator::make( $request->all(),
+            $rules = [
+                'email' => 'required|unique:users|max:255',
+                'name' => 'required',
+                'password' => ['required', Password::defaults(), 'confirmed']
+            ], [
+                'email.required' => 'Поле email не заполнено.',
+                'email.unique' => "Такой пользователь {$request['email']} уже есть.",
+                'email.max' => 'Поле email слишком длинное.',
+                'name.required' => 'Заполните ваше имя.',
+                'password.required' => 'Заполните поле пароль.',
+                'password.min' => 'Минимум 6 символов.',
+                'password.confirmed' => 'Проверьте подтверждение пароля.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'validation error',
+                'errors' => $validator->errors()
+            ], 401);
+        }
+
+        ;
+
+        $user = new User([
+            'name' => $new_id .'_'. $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
         try {
-            $user_row->save();
+            $user->save();
 
             return $this->login($request);
-
-//            return response()->json([
-//                'result'=>'Saved new user - '.$request->name
-//            ], 201);
 
         } catch (Throwable $e) {
 
@@ -107,6 +126,9 @@ class AuthController extends Controller
     }
 
 
+    /**
+     * @return JsonResponse
+     */
     public function index()
     {
         $users = User::get();
@@ -127,7 +149,8 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => auth()->user(),
         ]);
     }
 }
