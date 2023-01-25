@@ -1,40 +1,38 @@
-import AppStorage from "./AppStorage"
-import Token from "./Token"
+import Token from './Token'
+import AppStorage from "./AppStorage";
 
 class User {
-
     responseAfterLogin(res) {
-        const access_token = res.data.access_token
-        const user = res.data.user
-        if (Token.isValidFrom(access_token)) {
-            AppStorage.store(access_token, user)
+        const jwt = res.data.access_token
+        let user = res.data.user
+        if (Token.isValidFrom(jwt)) {
+            AppStorage.store(jwt, JSON.stringify(user))
         }
     }
 
-    hasValidToken() {
-        const stored_token = localStorage.getItem('token')
-        if (stored_token) {
-            return Token.isValidFrom(stored_token)
-        }
-        return false
+    responseAfterRegistration(res) {
+
     }
 
-    isLoggedIn() {
-        return this.hasValidToken()
+    responseAfterForgot(res) {
+
     }
 
-    name() {
-        if (this.isLoggedIn()) {
-            return localStorage.getItem('user').name
-        }
-        return false
+    responseAfter(res) {
+
     }
 
-    id() {
-        if (this.isLoggedIn()) {
-            return localStorage.getItem('user').id
-        }
-        return false
+    loggedIn() {
+        return this.hasToken()
+    }
+
+    hasToken() {
+        const token = localStorage.getItem('token')
+        return !!token
+    }
+
+    uName() {
+        return localStorage.getItem('user').name
     }
 }
 

@@ -6,16 +6,18 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="login-form">
-                                 <div class="text-center">
+                                <div class="text-center">
                                     <h1 class="h4 text-gray-900 mb-4">Login</h1>
                                 </div>
     <form class="user" @submit.prevent="login">
         <div class="form-group">
-            <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp"
+            <input type="email" class="form-control" id="exampleInputEmail"
+                   aria-describedby="emailHelp"
                    placeholder="Enter Email Address" v-model="form.email">
         </div>
         <div class="form-group">
-            <input type="password" class="form-control" id="exampleInputPassword" placeholder="Password" v-model="form.password">
+            <input type="password" class="form-control" id="exampleInputPassword"
+                   placeholder="Password" v-model="form.password">
         </div>
         <div class="form-group">
             <div class="custom-control custom-checkbox small" style="line-height: 1.5rem;">
@@ -30,10 +32,12 @@
     </form>
                                 <hr>
                                 <div class="text-center">
-                                    <router-link class="font-weight-bold small" to="/register">Create an Account!</router-link>
+                                    <router-link class="font-weight-bold small" to="/register">Create an Account!
+                                    </router-link>
                                 </div>
                                 <div class="text-center">
-                                    <router-link class="font-weight-bold small" to="/forget">Forgot Password?</router-link>
+                                    <router-link class="font-weight-bold small" to="/forgot">Forgot Password?
+                                    </router-link>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +51,11 @@
 <script type="application/javascript">
 
 export default {
-    // name: "login",
+    created() {
+        if (User.loggedIn()) {
+            this.$router.push( {name: 'home'} )
+        }
+    },
     data() {
         return {
             form: {
@@ -59,19 +67,16 @@ export default {
     methods: {
         login() {
             axios.post('/api/auth/login', this.form)
-                .then(res => User.responseAfterLogin(res))
+                .then(res => {
+                    User.responseAfterLogin(res)
+                    this.$router.push( {name: 'home'} )
+                })
                 .catch(error => console.log(error.response.data))
         }
     }
 }
-
-
 </script>
-
-
 
 <style scoped>
 
 </style>
-
-/** some comment */

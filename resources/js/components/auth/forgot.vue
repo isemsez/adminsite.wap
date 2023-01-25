@@ -9,13 +9,13 @@
                                  <div class="text-center">
                                     <h1 class="h4 text-gray-900 mb-4">Forgot your passowrd?</h1>
                                 </div>
-    <form class="user">
+    <form class="user" @submit.prevent="forgot">
         <div class="form-group">
             <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp"
-                   placeholder="Enter Your Existing Email">
+                   placeholder="Enter Your Existing Email" v-model="form.email">
         </div>
         <div class="form-group">
-            <a href="/" class="btn btn-primary btn-block">Remind me</a>
+            <button type="submit" class="btn btn-primary btn-block">Remind me</button>
         </div>
     </form>
                                 <hr>
@@ -34,9 +34,20 @@
     </div>
 </template>
 
-<script>
+<script type="application/javascript">
 export default {
-    name: "login"
+    data() {
+        return {
+            form: {
+                email: null,
+            }
+        }
+    },
+    methods: {
+        forgot() {
+            this.$router.push({ name: '/' })
+        }
+    }
 }
 </script>
 

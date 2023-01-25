@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -21,7 +19,48 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('JWT', ['except' => ['login', 'signup', 'index']]);
+        $this->middleware('auth:api', ['except' => ['login','register']]);
+    }
+
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:50', 'unique:users'],
+            'password' => ['required', Password::defaults(), 'confirmed'],
+        ], [
+            'email.required' => 'Поле email не заполнено.',
+            'email.unique' => "Пользователь {$request['email']} уже есть.",
+            'email.max' => 'Поле email должно быть не длиньше :max символов.',
+            'name.required' => 'Заполните ваше имя.',
+            'password.required' => 'Заполните поле пароль.',
+            'password.min' => 'Минимум :min символов.',
+            'password.confirmed' => 'Проверьте подтверждение пароля.',
+        ]);
+
+        if ( $validator->fails() ) {
+            return response()->json(['message' => 'Проверьте ваши данные!',
+                'error' => $validator->errors()
+            ], 401);
+        }
+
+        try {
+            $user = new User([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password)
+            ]);
+
+            $user->save();
+
+            return $this->login(201);
+
+        } catch (Throwable $e) {
+            return response()->json([
+                'message'=>'Не удалось сохранить нового пользователя.',
+                'error'=>$e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -29,15 +68,15 @@ class AuthController extends Controller
      *
      * @return JsonResponse
      */
-    public function login()
+    public function login($status_code = 200)
     {
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Email or password is wrong', 'credentials' => print_r($credentials)], 401);
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return $this->respondWithToken($token);
+        return $this->respondWithToken($token, $status_code);
     }
 
     /**
@@ -73,84 +112,22 @@ class AuthController extends Controller
     }
 
     /**
-     * Get the authenticated User.
-     *
-     * @return JsonResponse
-     */
-    public function signup(Request $request)
-    {
-        $new_id= User::all('id')->count() + 1;
-        $request['email'] = $new_id . $request->email;
-
-        $validator = Validator::make( $request->all(),
-            $rules = [
-                'email' => 'required|unique:users|max:255',
-                'name' => 'required',
-                'password' => ['required', Password::defaults(), 'confirmed']
-            ], [
-                'email.required' => 'Поле email не заполнено.',
-                'email.unique' => "Такой пользователь {$request['email']} уже есть.",
-                'email.max' => 'Поле email слишком длинное.',
-                'name.required' => 'Заполните ваше имя.',
-                'password.required' => 'Заполните поле пароль.',
-                'password.min' => 'Минимум 6 символов.',
-                'password.confirmed' => 'Проверьте подтверждение пароля.',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validator->errors()
-            ], 401);
-        }
-
-        ;
-
-        $user = new User([
-            'name' => $new_id .'_'. $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        try {
-            $user->save();
-
-            return $this->login($request);
-
-        } catch (Throwable $e) {
-
-            return response()->json(['error'=>$e->getMessage()], 500);
-        }
-    }
-
-
-    /**
-     * @return JsonResponse
-     */
-    public function index()
-    {
-        $users = User::get();
-
-        return response()->json(['data'=>$users]);
-    }
-
-
-    /**
      * Get the token array structure.
      *
      * @param  string $token
      *
      * @return JsonResponse
      */
-    protected function respondWithToken($token)
+    protected function respondWithToken($token, $status_code = 200)
     {
+
+        $user = User::whereEmail( request('email') )->first();
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => auth()->user(),
-        ]);
+            'user' => $user,
+        ], $status_code);
     }
 }
