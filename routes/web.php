@@ -19,5 +19,5 @@ use Illuminate\Support\Facades\Route;
 //});
 
 Route::get('/{vue_capture?}', function () {
-    return view('welcome');
+    return view('mainframe');
 })->where('vue_capture', '[\/\w\.-]*');

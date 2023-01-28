@@ -11,26 +11,30 @@
                                 </div>
     <form class="user" @submit.prevent="register">
         <div class="form-group">
-            <input type="text" class="form-control" id="exampleInputFirstName" placeholder="Enter Full Name" v-model="form.name">
+            <input type="text" class="form-control" id="exampleInputFirstName" placeholder="Введите ваше полное ФИО" v-model="form.name">
+            <small class="text-danger" v-if="errors.name">{{ errors.name[0] }}</small>
         </div>
         <div class="form-group">
             <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp"
-                   placeholder="Enter Email Address" v-model="form.email">
+                   placeholder="Введите ваш email" v-model="form.email">
+            <small class="text-danger" v-if="errors.email">{{ errors.email[0] }}</small>
         </div>
         <div class="form-group">
-            <input type="password" class="form-control" id="exampleInputPassword" placeholder="Password" v-model="form.password">
+            <input type="password" class="form-control" id="exampleInputPassword" placeholder="Придумайте пароль" v-model="form.password">
+            <small class="text-danger" v-if="errors.password">{{ errors.password[0] }}</small>
         </div>
         <div class="form-group">
             <input type="password" class="form-control" id="exampleInputPasswordRepeat"
-                   placeholder="Confirm Password" v-model="form.password_confirmation">
+                   placeholder="Подтверждение пароля" v-model="form.password_confirmation">
+            <small class="text-danger" v-if="errors.password_confirmation">{{ errors.password_confirmation[0] }}</small>
         </div>
         <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
+            <button type="submit" class="btn btn-primary btn-block">Создать уч.запись</button>
         </div>
     </form>
                                 <hr>
                                 <div class="text-center">
-                                    <router-link class="font-weight-bold small" to="/">Already have an account?</router-link>
+                                    <router-link class="font-weight-bold small" to="/">Уже есть учётная запись?</router-link>
                                 </div>
                             </div>
                         </div>
@@ -43,6 +47,11 @@
 
 <script type="application/javascript">
 export default {
+    created() {
+        if ( User.loggedIn() ) {
+            this.$router.push( {name: 'home'} )
+        }
+    },
     data() {
         return {
             form: {
@@ -50,14 +59,28 @@ export default {
                 email: null,
                 password: null,
                 password_confirmation: null,
-            }
+            },
+            errors: {}
         }
     },
     methods: {
         register() {
+            this.errors = {}
             axios.post('/api/auth/register', this.form)
-                .then(res => User.responseAfterRegistration(res) )
-                .catch(error => console.log(error.response.data))
+                .then(res => {
+                    User.responseAfterLogin(res)
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Успешно зарегистрировались!'
+                    })
+                })
+                .catch(err => {
+                    this.errors = err.response.data.error
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Ошибка авторизации!'
+                    })
+                })
         }
     }
 }

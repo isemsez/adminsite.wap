@@ -4,22 +4,10 @@ import AppStorage from "./AppStorage";
 class User {
     responseAfterLogin(res) {
         const jwt = res.data.access_token
-        let user = res.data.user
+        const user = res.data.user
         if (Token.isValidFrom(jwt)) {
             AppStorage.store(jwt, JSON.stringify(user))
         }
-    }
-
-    responseAfterRegistration(res) {
-
-    }
-
-    responseAfterForgot(res) {
-
-    }
-
-    responseAfter(res) {
-
     }
 
     loggedIn() {
@@ -31,8 +19,17 @@ class User {
         return !!token
     }
 
+    getUserObj() {
+        return JSON.parse(localStorage.getItem('user'))
+    }
+
     uName() {
-        return localStorage.getItem('user').name
+        return this.getUserObj()['name']
+    }
+
+    clear() {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
     }
 }
 

@@ -26,7 +26,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:50', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:20', 'unique:users'],
             'password' => ['required', Password::defaults(), 'confirmed'],
         ], [
             'email.required' => 'Поле email не заполнено.',
@@ -70,6 +70,22 @@ class AuthController extends Controller
      */
     public function login($status_code = 200)
     {
+        $validator = Validator::make( request()->all(), [
+            'email' => ['required', 'string', 'email', 'max:20'],
+            'password' => ['required', Password::defaults()],
+        ], [
+            'email.required' => 'Поле email не заполнено.',
+            'email.max' => 'Поле email должно быть не длиньше :max символов.',
+            'password.required' => 'Заполните поле пароль.',
+            'password.min' => 'Минимум :min символов.',
+        ]);
+        if ( $validator->fails() ) {
+            return response()->json([
+                'message' => 'Проверьте ваши данные!',
+                'error' => $validator->errors()
+            ], 401);
+        }
+
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {

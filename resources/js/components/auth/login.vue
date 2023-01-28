@@ -13,30 +13,30 @@
         <div class="form-group">
             <input type="email" class="form-control" id="exampleInputEmail"
                    aria-describedby="emailHelp"
-                   placeholder="Enter Email Address" v-model="form.email">
+                   placeholder="Введите email" v-model="form.email">
+            <small class="text-danger" v-if="errors.email"> {{ errors.email[0] }} </small>
         </div>
         <div class="form-group">
-            <input type="password" class="form-control" id="exampleInputPassword"
-                   placeholder="Password" v-model="form.password">
+            <input type="password" class="form-control" id="exampleInputPassword" placeholder="Придумайте пароль" v-model="form.password">
+            <small class="text-danger" v-if="errors.password"> {{ errors.password[0] }} </small>
         </div>
         <div class="form-group">
             <div class="custom-control custom-checkbox small" style="line-height: 1.5rem;">
                 <input type="checkbox" class="custom-control-input" id="customCheck">
-                <label class="custom-control-label" for="customCheck">Remember
-                    Me</label>
+                <label class="custom-control-label" for="customCheck">Запомнить меня</label>
             </div>
         </div>
         <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="submit" class="btn btn-primary btn-block">Войти</button>
         </div>
     </form>
                                 <hr>
                                 <div class="text-center">
-                                    <router-link class="font-weight-bold small" to="/register">Create an Account!
+                                    <router-link class="font-weight-bold small" to="/register">Создать уч.запись
                                     </router-link>
                                 </div>
                                 <div class="text-center">
-                                    <router-link class="font-weight-bold small" to="/forgot">Forgot Password?
+                                    <router-link class="font-weight-bold small" to="/forgot">Забыли пароль?
                                     </router-link>
                                 </div>
                             </div>
@@ -61,17 +61,28 @@ export default {
             form: {
                 email: null,
                 password: null,
-            }
+            },
+            errors: {}
         }
     },
     methods: {
         login() {
             axios.post('/api/auth/login', this.form)
-                .then(res => {
+                .then( res => {
                     User.responseAfterLogin(res)
+                    Toast.fire({
+                        icon: "success",
+                        title: 'Вошли как пользователь!',
+                    })
                     this.$router.push( {name: 'home'} )
                 })
-                .catch(error => console.log(error.response.data))
+                .catch( err => {
+                    this.errors = err.response.data.error
+                    Toast.fire({
+                        icon: "error",
+                        title: "Ошибка авторизации!",
+                    })
+                })
         }
     }
 }
