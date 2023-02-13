@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\EmployeeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,3 +35,5 @@ Route::group([
     Route::post('me', [AuthController::class, 'me']);
     Route::get('/', [AuthController::class, 'index']);
 });
+
+Route::apiResource('/employee', EmployeeController::class);

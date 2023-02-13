@@ -22,11 +22,17 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login','register']]);
     }
 
+    /**
+     * Create new user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:20', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:30', 'unique:users'],
             'password' => ['required', Password::defaults(), 'confirmed'],
         ], [
             'email.required' => 'Поле email не заполнено.',
@@ -66,6 +72,7 @@ class AuthController extends Controller
     /**
      * Get a JWT via given credentials.
      *
+     * @param int $status_code Optional, to pass status code 201 to login() method when triggered as aftereffect of register()
      * @return JsonResponse
      */
     public function login($status_code = 200)
