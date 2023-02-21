@@ -10,9 +10,9 @@
                         <div class="col-lg-12">
                             <div class="login-form">
                                 <div class="text-center">
-                                    <h1 class="h4 text-gray-900 mb-4">Создать нового работника</h1>
+                                    <h1 class="h4 text-gray-900 mb-4">Редактировать работника</h1>
                                 </div>
-                                <form class="user" enctype="multipart/form-data" @submit.prevent="createEmployee">
+                                <form @submit.prevent="editEmployee" class="user" enctype="multipart/form-data">
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-md-6">
@@ -44,10 +44,8 @@
                                                     }}</small>
                                             </div>
                                             <div class="col-md-6">
-                                                <!--                                                       pattern="\+7\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}"-->
-                                                <input id="phone" v-model="form.phone"
-                                                       @input="tel_format"
-                                                       class="form-control"
+                                                <!-- pattern="\+7\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}"-->
+                                                <input id="phone" v-model="form.phone" class="form-control"
                                                        placeholder="+7(012)345-67-89 № телефона"
                                                        type="tel">
                                                 <small v-if="errors.phone"
@@ -81,24 +79,25 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
-                <div class="col-md-6">
-                    <label for="customFile" style="margin-bottom: 0;">Фото работника</label>
-                    <input id="customFile" @change="onImageSelect" accept="image/*"
-                           class="custom-file" type="file">
-                    <small v-if="errors.photo" class="text-danger">{{
-                            errors.photo[0]
-                        }}</small>
-                </div>
-                <div class="col-md-6">
-                    <img v-show="imagePath" id="previewImage"
-                         :src="imagePath" alt="image"
-                         style="max-height: 8em; max-width: 100%;"/>
-                </div>
+                                            <div class="col-md-6">
+                                                <label class="" for="customFile" style="margin-bottom: 0;">
+                                                    Фото работника</label>
+                                                <input @change="onImageSelect" id="customFile" accept="image/*"
+                                                       class="custom-file" type="file">
+                                                <small v-if="errors.photo" class="text-danger">{{
+                                                        errors.photo[0]
+                                                    }}</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <img v-show="imagePath" id="previewImage"
+                                                     :src="imagePath" alt="image"
+                                                     style="max-height: 8em; max-width: 100%;"/>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <button class="btn btn-primary btn-block" type="submit">Создать уч.запись
-                                        </button>
+                                        <button class="btn btn-primary btn-block" type="submit">
+                                            Сохранить</button>
                                     </div>
                                 </form>
                                 <hr>
@@ -116,6 +115,17 @@ export default {
     created() {
         if (!User.loggedIn()) {
             this.$router.push({ name: '/' })
+        } else {
+            let id = this.$route.params.id
+            axios.get('/api/employee/'+id)
+                .then( ({data}) => {
+                    this.form = data.employee
+                    this.imagePath = window.location.origin + data.image_path
+                })
+                .catch( err => {
+                    console.log('-')
+                    console.log(err.response.data)
+                })
         }
     },
     data() {
@@ -126,7 +136,7 @@ export default {
                 address: null,
                 salary: null,
                 joining_date: null,
-                phone: '+7(9..',
+                phone: null,
                 photo: null,
             },
             imagePath: null,
@@ -134,14 +144,12 @@ export default {
         }
     },
     methods: {
-        createEmployee() {
-            axios.post('/api/employee', this.form)
+        editEmployee() {
+            let id = this.$route.params.id
+            axios.put('/api/employee/'+id, this.form)
                 .then(res => {
                     this.$router.push({ name: 'employee_index' })
                     Notification.success()
-
-                    console.log('+')
-                    console.log(res.data)
                 })
                 .catch(err => {
                     const errors = err.response.data.error;
@@ -172,16 +180,6 @@ export default {
                 reader.readAsDataURL(file)
                 this.imagePath = URL.createObjectURL(file)
             }
-        },
-        tel_format() {
-            let x = this.form.phone
-            x = x.replace(/\D/g,'').replace(/^7/,'')
-                .match(/(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/)
-            x = !x[2] ? "("+x[1] + (x[1].length === 3 ? ')' : '')
-                : "("+x[1]+")"+x[2] + (x[2].length===3 ? '-' : '')
-                + (!x[3] ? "" : x[3] + (x[3].length===2 ? '-' : '')
-                    + (!x[4] ? '' : x[4]) )
-            this.form.phone = '+7' + x
         }
     }
 }
