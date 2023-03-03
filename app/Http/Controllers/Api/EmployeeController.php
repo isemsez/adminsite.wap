@@ -16,6 +16,19 @@ use Intervention\Image\ImageManagerStatic as Image;
 class EmployeeController extends Controller
 {
     /**
+     * @var string []
+     */
+    private $validation_rules = [
+        'name' => ['required', 'regex:/^[\pL ]+$/u', 'min:2', 'max:255'],
+        'email' => ['required', 'string', 'email', 'regex:/\.\pL{2,6}$/u', 'max:30', 'unique:employees'],
+        'address' => ['required', 'string', 'regex:/^(\pL|,|\.|[0-9]| )+$/u', 'min:5', 'max:255'],
+        'salary' => ['required', 'numeric', 'min:100', 'max:100000000'],
+        'joining_date' => ['required', 'date', 'before:tomorrow'],
+        'phone' => ['required', 'regex:/^\+?([0-9]|\(|\)|-| )+$/'],
+        'photo' => ['string', 'regex:/^data:image\//', 'max:130000000'],  // "reader.readAsDataURL"
+    ];
+
+    /**
      * Display a listing of the resource.
      *
      * @return JsonResponse
@@ -60,7 +73,6 @@ class EmployeeController extends Controller
             'salary' => $employee['salary'],
             'joining_date' => explode(' ', $employee['joining_date'] )[0],
             'phone' => $employee['phone'],
-            'photo' => null,
         ];
 
         return response()->json([
@@ -102,7 +114,7 @@ class EmployeeController extends Controller
         if ($photo_path_relative = $employee['photo']) {
             $photo_path_absolute = public_path() . DIRECTORY_SEPARATOR . $photo_path_relative;
             if (!file_exists($photo_path_absolute)) {
-                throw new FileNotFoundException('Нет такого файла '.$photo_path_relative.' .');
+                throw new FileNotFoundException('Файл '.$photo_path_relative.' не найден.');
             }
         }
 
@@ -123,21 +135,14 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Проверка пришедших данных.
+     *
      * @param Request $request
      * @return JsonResponse|Void
      */
     private function validate_form(Request $request)
     {
-        $validator = Validator::make( $request->all(), [
-
-            'name' => ['required', 'regex:/^[\pL ]+$/u', 'min:2', 'max:255'],
-            'email' => ['required', 'string', 'email', 'regex:/\.\pL{2,6}$/u', 'max:30', 'unique:employees'],
-            'address' => ['required', 'string', 'regex:/^(\pL|,|\.|[0-9]| )+$/u', 'min:5', 'max:255'],
-            'salary' => ['required', 'numeric', 'min:100', 'max:100000000'],
-            'joining_date' => ['required', 'date', 'before:tomorrow'],
-            'phone' => ['required', 'regex:/^\+?([0-9]|\(|\)|-| )+$/'],
-            'photo' => ['string', 'regex:/^data:image\//', 'max:130000000'],  // "reader.readAsDataURL"
-        ]);
+        $validator = Validator::make( $request->all(), $this->validation_rules);
 
         if ($validator->fails()) {
             return response()->json([
@@ -148,6 +153,8 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Заполнить Model данными из запроса.
+     *
      * @param Request $request
      * @param Employee $employee An employee.
      * @return Void
@@ -181,6 +188,8 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Если указанной папки не существует, создать ее.
+     *
      * @param string $server_local_path
      * @return void
      */
@@ -196,7 +205,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Retrieve employee from Model by id. Or return error.
+     * Найти работника в Employee модели или вернуть ошибку.
      *
      * @param numeric-string $id
      * @return JsonResponse|Employee
@@ -213,6 +222,8 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Постараться сохранить работника в Employee модели или вернуть ошибку.
+     *
      * @param Employee $employee New or existing employee in Model.
      * @return JsonResponse|void
      */
