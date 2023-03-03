@@ -152,6 +152,11 @@ class EmployeeController extends Controller
         }
     }
 
+    private function some_function()
+    {
+        //
+    }
+
     /**
      * Заполнить Model данными из запроса.
      *
