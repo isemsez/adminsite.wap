@@ -147,6 +147,11 @@ class EmployeeController extends Controller
         }
     }
 
+    private function some_function()
+    {
+        //
+    }
+
     /**
      * @param Request $request
      * @param Employee $employee An employee.
