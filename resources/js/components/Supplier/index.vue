@@ -3,6 +3,7 @@
 </template>
 
 <script>
+// minor change
 export default {
     name: "index"
 }
