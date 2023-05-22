@@ -4,6 +4,7 @@
 
 <script>
 // minor change
+// another change
 export default {
     name: "index"
 }
