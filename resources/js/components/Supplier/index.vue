@@ -5,6 +5,7 @@
 <script>
 // minor change
 // another change
+// third minor change to test changing git user
 export default {
     name: "index"
 }
@@ -13,3 +14,4 @@ export default {
 <style scoped>
 
 </style>
+
