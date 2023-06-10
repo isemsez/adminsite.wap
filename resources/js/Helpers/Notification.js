@@ -1,11 +1,11 @@
 class Notification {
 
-    success() {
+    success(txt = "Успешно!") {
         new Noty({
             type: "success",
             layout: "topRight",
-            text: "Успешно!",
-            timeout: 1000,
+            text: txt,
+            timeout: 5000,
         }).show()
     }
 
@@ -14,34 +14,24 @@ class Notification {
             type: "alert",
             layout: "topRight",
             text: "Вы уверены?",
-            timeout: 1000,
-        }).show()
-    }
-
-    error(text='') {
-        new Noty({
-            type: "error",
-            layout: "topRight",
-            text: text ?? 'Ошибка!',
             timeout: 5000,
         }).show()
     }
 
-    warning(text='') {
+    error(txt= 'Ошибка!') {
+        new Noty({
+            type: "error",
+            layout: "topRight",
+            text: txt,
+            timeout: 5000,
+        }).show()
+    }
+
+    warning(txt= "Что-то неправильно!") {
         new Noty({
             type: "warning",
             layout: "topRight",
-            text: text ?? "Что-то неправильно!",
-            timeout: 5000,
-        }).show()
-    }
-
-    image_bigger_1mb() {
-        console.log('Notification')
-        new Noty({
-            type: "error",
-            layout: "topRight",
-            text: "Фото должно быть не больше 1Мб.",
+            text: txt,
             timeout: 5000,
         }).show()
     }

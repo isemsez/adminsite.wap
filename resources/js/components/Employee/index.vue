@@ -37,7 +37,7 @@
                                 <td><img :src="employee.photo" id="emp_photo" alt="photo"></td>
                                 <td>{{ employee.phone }}</td>
                                 <td>{{ employee.salary }}</td>
-                                <td>{{ employee.joining_date }}</td>
+                                <td>{{ (employee.joining_date.split(' '))[0] }}</td>
                                 <td>
                                     <router-link :to="{ name: 'employee_edit', params: { id: employee.id } }" class="btn btn-sm btn-primary">
                                         Редактировать</router-link>
@@ -75,7 +75,7 @@ export default {
             return length ? length : ''
         },
         filtered() {
-            var search_str = this.searchBox
+            let search_str = this.searchBox
             if (!search_str) {
                 return this.employees
             }

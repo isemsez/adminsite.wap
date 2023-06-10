@@ -48,7 +48,6 @@
                                                 <input id="phone" v-model="form.phone"
                                                        @input="tel_format"
                                                        class="form-control"
-                                                       placeholder="+7(012)345-67-89 № телефона"
                                                        type="tel">
                                                 <small v-if="errors.phone"
                                                        class="text-danger">{{ errors.phone[0] }}</small>

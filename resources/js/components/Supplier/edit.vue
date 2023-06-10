@@ -2,17 +2,17 @@
 
     <div class="row justify-content-center">
         <div class="col-xl-12 col-lg-12 col-md-12">
-            <router-link :to="{ name: 'employee_index' }" class="btn btn-primary col-md-4">
-                Все работники</router-link>
+            <router-link :to="{ name: 'supplier_index' }" class="btn btn-primary col-md-4">
+                Все поставщики</router-link>
             <div class="card shadow-sm mt-2 mb-5">
                 <div class="card-body p-0">
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="login-form">
                                 <div class="text-center">
-                                    <h1 class="h4 text-gray-900 mb-4">Редактировать работника</h1>
+                                    <h1 class="h4 text-gray-900 mb-4">Редактировать поставщика</h1>
                                 </div>
-                                <form @submit.prevent="editEmployee" class="user" enctype="multipart/form-data">
+                                <form @submit.prevent="editSupplier" class="user" enctype="multipart/form-data">
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-md-6">
@@ -46,7 +46,6 @@
                                             <div class="col-md-6">
                                                 <!-- pattern="\+7\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}"-->
                                                 <input id="phone" v-model="form.phone" class="form-control"
-                                                       placeholder="+7(012)345-67-89 № телефона"
                                                        type="tel">
                                                 <small v-if="errors.phone"
                                                        class="text-danger">{{ errors.phone[0] }}</small>
@@ -56,32 +55,21 @@
                                     <div class="form-group mb-0">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <input id="salary" v-model="form.salary" class="form-control"
-                                                       placeholder="Введите зарплату"
+                                                <input id="salary" v-model="form.shopname" class="form-control"
+                                                       placeholder="Название магазина"
                                                        type="text">
-                                                <small v-if="errors.salary" class="text-danger">{{
+                                                <small v-if="errors.shopname" class="text-danger">{{
                                                         errors.salary[0]
                                                     }}</small>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group mb-0">
-                                                    <input id="joiningDate" v-model="form.joining_date" class="form-control"
-                                                           type="date">
-                                                    <label for="joiningDate" style="margin-bottom: 0; font-size: .9rem;">
-                                                        Когда устроился(ась) на работу</label>
-                                                    <small v-if="errors.joining_date"
-                                                           class="text-danger">{{
-                                                            errors.joining_date[0]
-                                                        }}</small>
-                                                </div>
-                                            </div>
+
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <label class="" for="customFile" style="margin-bottom: 0;">
-                                                    Фото работника</label>
+                                                    Логотип поставщика</label>
                                                 <input @change="onImageSelect" id="customFile" accept="image/*"
                                                        class="custom-file" type="file">
                                                 <small v-if="errors.photo" class="text-danger">{{
@@ -89,8 +77,8 @@
                                                     }}</small>
                                             </div>
                                             <div class="col-md-6">
-                                                <img v-show="form.photo" id="previewImage"
-                                                     :src="form.photo" alt="image"
+                                                <img v-show="imagePath" id="previewImage"
+                                                     :src="imagePath" alt="image"
                                                      style="max-height: 8em; max-width: 100%;"/>
                                             </div>
                                         </div>
@@ -116,7 +104,7 @@ export default {
         if (!User.loggedIn()) {
             this.$router.push({ name: '/' })
         } else {
-            this.getEmployee()
+            this.getSupplier()
         }
     },
     data() {
@@ -125,8 +113,7 @@ export default {
                 name: null,
                 email: null,
                 address: null,
-                salary: null,
-                joining_date: null,
+                shopname: null,
                 phone: null,
                 photo: null,
             },
@@ -135,45 +122,54 @@ export default {
         }
     },
     methods: {
-        getEmployee() {
+        getSupplier() {
             let id = this.$route.params.id
-            axios.get('/api/employee/'+id)
+            axios.get('/api/supplier/'+id)
                 .then( (resp) => {
-                    this.form = resp.data.employee
-                    this.imagePath = window.location.origin + resp.data.image_path
+                    let incoming_data = resp.data.data
+                    if (incoming_data.photo != null) {
+                        this.imagePath = window.location.origin + incoming_data.photo
+                        delete incoming_data.photo
+                    }
+                    this.form = incoming_data
                 })
                 .catch( err => {
-                    console.log('-')
-                    console.log(err.response.data)
-                })},
-        editEmployee() {
+                    this.errors = err.response.data.errors ?? this.errors
+                    const warning = err.response.data.error ?? "Ошибка!";
+                    Toast.fire({
+                        icon: "error",
+                        title: warning,
+                        timer: 5000,
+                    })
+                    console.log('-', err.response.data)
+                })
+        },
+        editSupplier() {
             let id = this.$route.params.id
-            axios.put('/api/employee/'+id, this.form)
-                .then( () => {
-                    this.$router.push({ name: 'employee_index' })
-                    Notification.success()
+            let uploading_data = this.form
+            if (uploading_data.photo === null) {
+                delete uploading_data.photo
+            }
+            axios.put('/api/supplier/'+id, uploading_data)
+                .then( (res) => {
+                    Notification.success(res.data.message)
+                    this.$router.push({ name: 'supplier_index' })
                 })
                 .catch(err => {
-                    const errors = err.response.data.error;
-                    if (errors) {
-                        this.errors = errors
-                    }
-
+                    this.errors = err.response.data.errors ?? this.errors
                     const warning = err.response.data.message ?? "Ошибка!";
                     Toast.fire({
                         icon: "error",
                         title: warning,
                         timer: 5000,
                     })
-
-                    console.log('-')
-                    console.log(err.response.data)
+                    console.log('-', err.response.data)
                 })
         },
         onImageSelect(event) {
             const file = event.target.files[0];
-            if (file.size > 1048576) {
-                Notification.error('Фото должно быть меньше 1Мб.')
+            if (file.size > 1*1024*1024) {
+                Notification.error("Фото должно быть меньше 1Мб.")
             } else {
                 let reader = new FileReader()
                 reader.onload = event => {
