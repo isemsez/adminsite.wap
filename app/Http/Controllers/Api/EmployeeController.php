@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Middleware\EncryptCookies;
 use App\Models\Employee;
 use App\Models\ModelCommon;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
 
 class EmployeeController extends Controller
 {

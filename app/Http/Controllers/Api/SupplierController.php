@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\ModelCommon;
 use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 
 class SupplierController extends Controller
