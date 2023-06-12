@@ -7,9 +7,15 @@ let home = require('./components/home.vue').default
 let employee_create = require('./components/Employee/create.vue').default
 let employee_index = require('./components/Employee/index.vue').default
 let employee_edit = require('./components/Employee/edit.vue').default
+
 let supplier_create = require('./components/Supplier/create.vue').default
 let supplier_index = require('./components/Supplier/index.vue').default
 let supplier_edit = require('./components/Supplier/edit.vue').default
+
+let category_index = require('./components/Category/index.vue').default
+let category_create = require('./components/Category/create.vue').default
+let category_edit = require('./components/Category/edit.vue').default
+
 
 export const routes = [
     { path: '/', component: login, name: '/' },
@@ -27,4 +33,9 @@ export const routes = [
     { path: '/supplier-create', component: supplier_create, name: 'supplier_create'},
     { path: '/supplier-list', component: supplier_index, name: 'supplier_index'},
     { path: '/supplier-edit/:id', component: supplier_edit, name: 'supplier_edit' },
+
+    // Categories
+    { path: '/category-list', component: category_index, name: 'category_index'},
+    { path: '/category-create', component: category_create, name: 'category_create'},
+    { path: '/category-edit/:id', component: category_edit, name: 'category_edit'},
 ]

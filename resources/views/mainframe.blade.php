@@ -46,8 +46,8 @@
                       data-parent="#accordionSidebar">
                      <div class="bg-white py-2 collapse-inner rounded">
                          <h6 class="collapse-header">Employee</h6>
-                         <router-link class="collapse-item" :to="{ name: 'employee_create' }">Add Employee</router-link>
                          <router-link class="collapse-item" :to="{ name: 'employee_index' }">All Employees</router-link>
+                         <router-link class="collapse-item" :to="{ name: 'employee_create' }">Add Employee</router-link>
                      </div>
                  </div>
              </li>
@@ -61,8 +61,23 @@
                      data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Supplier</h6>
-                        <router-link class="collapse-item" :to="{ name: 'supplier_create' }">Add Supplier</router-link>
                         <router-link class="collapse-item" :to="{ name: 'supplier_index' }">All Suppliers</router-link>
+                        <router-link class="collapse-item" :to="{ name: 'supplier_create' }">Add Supplier</router-link>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap3"
+                   aria-expanded="true" aria-controls="collapseBootstrap3">
+                    <i class="far fa-fw fa-window-maximize"></i>
+                    <span>Category</span>
+                </a>
+                <div id="collapseBootstrap3" class="collapse" aria-labelledby="headingBootstrap3"
+                     data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Caategory</h6>
+                        <router-link class="collapse-item" :to="{ name: 'category_index' }">All Categories</router-link>
+                        <router-link class="collapse-item" :to="{ name: 'category_create' }">Add Category</router-link>
                     </div>
                 </div>
             </li>

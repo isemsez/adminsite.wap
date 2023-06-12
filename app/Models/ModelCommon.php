@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use ReflectionClass;
 
@@ -18,13 +17,12 @@ class ModelCommon extends Model
     use HasFactory;
 
     /** Validate incoming form data.
-     * @param Request $request
      * @param array $validation_rules
-     * @return array|void
+     * @return array<bool|JsonResponse>|void
      */
-    public static function validate_form_data(Request $request, array $validation_rules)
+    public static function validate_form_data(array $validation_rules)
     {
-        $validator = Validator::make($request->all(), $validation_rules);
+        $validator = Validator::make( request()->all(), $validation_rules );
         if ( $validator->fails() ) {
             return [
                 'failed' => true,
@@ -40,7 +38,7 @@ class ModelCommon extends Model
     /** Заполнить model данными из запроса и сохранить.
      * @return void
      */
-    public function model_fill_data_and_save()
+    public function model_load_and_save()
     {
         foreach ( request()->post() as $key=>$value) {
 
@@ -49,7 +47,6 @@ class ModelCommon extends Model
                 $photo_url_path = Controller::save_photo( $value,
                     strtolower( $this->model_class_name() )
                 );
-
                 // replacing photo
                 if ( !empty($this->photo) ) {
                     unlink($_SERVER['DOCUMENT_ROOT'] . $this->photo);
