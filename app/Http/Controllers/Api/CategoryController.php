@@ -20,6 +20,7 @@ class CategoryController extends Controller
         return response()->json( [ 'message' => 'Успешно.', 'data' => $categories ] );
     }
 
+
     /**
      * Store a newly created resource in storage.
      *
@@ -40,6 +41,7 @@ class CategoryController extends Controller
         return response()->json( [ 'message' => 'Новая категория создана' ], 201 );
     }
 
+
     /**
      * Display the specified resource.
      *
@@ -48,10 +50,11 @@ class CategoryController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $category = Category::query()->find( $id );
+        $category = Category::query()->findOrFail( $id );
 
         return response()->json( [ 'message' => 'Успешно', 'data' => $category ] );
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -61,7 +64,7 @@ class CategoryController extends Controller
      */
     public function update(int $id): JsonResponse
     {
-        $category = Category::query()->find( $id );
+        $category = Category::query()->findOrFail( $id );
         $validation = $category->validate();
 
         if ( isset( $validation['failed'] ) ) {
@@ -70,8 +73,9 @@ class CategoryController extends Controller
 
         $category->model_load_and_save();
 
-        return response()->json( [ 'message' => 'Успешно сохранено.' ] );
+        return response()->json( [ 'message' => 'Успешно сохранено.' ],202 );
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -81,7 +85,9 @@ class CategoryController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        Category::query()->findOrFail( $id )->delete();
+        if ( !Category::query()->findOrFail( $id )->delete() ) {
+            return response()->json(['message'=>'Не удалено!'], 501);
+        }
 
         return response()->json( [ 'message' => 'Успешно удалено.' ] );
     }

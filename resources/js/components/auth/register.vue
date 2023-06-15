@@ -75,10 +75,11 @@ export default {
                     })
                 })
                 .catch(err => {
-                    this.errors = err.response.data.error
+                    this.errors = err.response.data.errors ?? this.errors
+                    const warning = err.response.data.message ?? 'Ошибка авторизации!'
                     Toast.fire({
                         icon: 'error',
-                        title: 'Ошибка авторизации!'
+                        title: warning
                     })
                 })
         }

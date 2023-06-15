@@ -97,9 +97,18 @@ export default {
         getEmployees() {
             axios.get('api/employee')
                 .then(res => {
-                    this.employees = res.data.employees
+                    this.employees = res.data.data
                 })
-                .catch(err => console.log(err.response.data.error))
+                .catch(err => {
+                    const message = err.response.data.message;
+                    Toast.fire({
+                        icon: "error",
+                        title: message,
+                        timer: 5000,
+                    })
+                    console.log(err.response.data.error);
+                    }
+                )
         },
         employeeDelete(id) {
             Swal.fire({
@@ -146,3 +155,4 @@ export default {
     max-width: fit-content;
 }
 </style>
+

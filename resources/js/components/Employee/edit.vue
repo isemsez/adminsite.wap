@@ -139,8 +139,9 @@ export default {
             let id = this.$route.params.id
             axios.get('/api/employee/'+id)
                 .then( (resp) => {
-                    this.form = resp.data.employee
-                    this.imagePath = window.location.origin + resp.data.image_path
+                    this.form = resp.data.data
+                    this.imagePath = window.location.origin + this.form.photo
+                    this.form.photo = null
                 })
                 .catch( err => {
                     console.log('-')
@@ -150,8 +151,8 @@ export default {
             let id = this.$route.params.id
             axios.put('/api/employee/'+id, this.form)
                 .then( () => {
-                    this.$router.push({ name: 'employee_index' })
                     Notification.success()
+                    this.$router.push({ name: 'employee_index' })
                 })
                 .catch(err => {
                     const errors = err.response.data.error;
