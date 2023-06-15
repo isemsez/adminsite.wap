@@ -143,10 +143,7 @@ export default {
                     console.log(res.data)
                 })
                 .catch(err => {
-                    const errors = err.response.data.error;
-                    if (errors) {
-                        this.errors = errors
-                    }
+                    this.errors = err.response.data.errors ?? {}
 
                     const warning = err.response.data.message ?? "Ошибка!";
                     Toast.fire({

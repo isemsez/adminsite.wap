@@ -13,16 +13,16 @@ class CreateSuppliersTable extends Migration
      */
     public function up()
     {
-        Schema::create('suppliers', function (Blueprint $table) {
-            $table->id('id');
-            $table->string('name');
-            $table->string('email');
-            $table->string('phone');
-            $table->string('address');
-            $table->string('photo')->nullable();
-            $table->string('shopname')->nullable();
+        Schema::create( 'suppliers', function (Blueprint $table) {
+            $table->id();
+            $table->string( 'name' );
+            $table->string( 'email' );
+            $table->string( 'phone' );
+            $table->string( 'address' );
+            $table->string( 'shopname' )->nullable();
+            $table->string( 'photo' )->nullable();
             $table->timestamps();
-        });
+        } );
     }
 
     /**
@@ -32,8 +32,6 @@ class CreateSuppliersTable extends Migration
      */
     public function down()
     {
-        Schema::table('suppliers', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists( 'suppliers' );
     }
 }

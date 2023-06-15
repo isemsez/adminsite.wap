@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
 
 class Category extends ModelCommon
 {
@@ -20,9 +19,11 @@ class Category extends ModelCommon
 
 
     /**
+     * Validate incoming data.
+     *
      * @return JsonResponse|void
      */
-    public function validate()
+    public function validate(): ?JsonResponse
     {
         $validation_rules = [
             'category_name' => [
@@ -37,7 +38,7 @@ class Category extends ModelCommon
         $validator = $this->validate_form_data( $validation_rules );
 
         if ( isset( $validator['failed'] ) ) {
-            return $validator['validation_failed_jsonresponse'];
+            return $validator['validation_failed_json_response'];
         }
 
     }

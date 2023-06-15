@@ -13,17 +13,17 @@ class CreateEmployeesTable extends Migration
      */
     public function up()
     {
-        Schema::create('employees', function (Blueprint $table) {
-            $table->id('id');
-            $table->string('name');
-            $table->string('email');
-            $table->string('address');
-            $table->string('salary');
-            $table->dateTime('joining_date');
-            $table->string('phone');
-            $table->string('photo')->nullable();
+        Schema::create( 'employees', function (Blueprint $table) {
+            $table->id();
+            $table->string( 'name' );
+            $table->string( 'email' );
+            $table->string( 'address' );
+            $table->string( 'salary' );
+            $table->dateTime( 'joining_date' );
+            $table->string( 'phone' );
+            $table->string( 'photo' )->nullable();
             $table->timestamps();
-        });
+        } );
     }
 
     /**
@@ -33,6 +33,6 @@ class CreateEmployeesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('employees');
+        Schema::dropIfExists( 'employees' );
     }
 }

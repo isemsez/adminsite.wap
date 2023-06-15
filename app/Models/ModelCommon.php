@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use ReflectionClass;
 
@@ -16,59 +15,67 @@ class ModelCommon extends Model
 {
     use HasFactory;
 
-    /** Validate incoming form data.
+    /**
+     * Validate incoming form data.
+     *
      * @param array $validation_rules
-     * @return array<bool|JsonResponse>|void
+     * @return array|void
      */
     public static function validate_form_data(array $validation_rules)
     {
         $validator = Validator::make( request()->all(), $validation_rules );
         if ( $validator->fails() ) {
             return [
-                'failed' => true,
-                'validation_failed_jsonresponse' => response()->json([
+                'failed'                          => true,
+                'validation_failed_json_response' => response()->json( [
                     'message' => 'Проверьте ваши данные.',
-                    'errors' => $validator->errors()
-                ])
+                    'errors'  => $validator->errors()
+                ], 422 )
             ];
         }
     }
 
 
-    /** Заполнить model данными из запроса и сохранить.
+    /**
+     * Заполнить model данными из запроса и сохранить.
+     *
      * @return void
      */
-    public function model_load_and_save()
+    public function model_load_and_save(): void
     {
-        foreach ( request()->post() as $key=>$value) {
+        $incoming_data = request()->post();
 
-            if ($key == 'photo' && $value) {
+        if ( array_key_exists( 'photo', $incoming_data ) ) {
 
-                $photo_url_path = Controller::save_photo( $value,
+            if ( !empty( $incoming_data['photo'] ) ) {
+
+                $photo_url_path = Controller::save_photo( $incoming_data['photo'],
                     strtolower( $this->model_class_name() )
                 );
+
                 // replacing photo
-                if ( !empty($this->photo) ) {
-                    unlink($_SERVER['DOCUMENT_ROOT'] . $this->photo);
+                if ( $this->photo ) {
+                    unlink( $_SERVER['DOCUMENT_ROOT'] . $this->photo );
                 }
-                $this->photo = $photo_url_path;
+
+                $incoming_data['photo'] = $photo_url_path;
 
             } else {
-                $this[$key] = $value;
+                unset( $incoming_data['photo'] );  // not to erase existing photo
             }
         }
 
-        $this->query()->updateOrCreate( ['id' => $this->id], $this->toArray() );
+        $this->query()->updateOrCreate( [ 'id' => $this->id ], $incoming_data );
     }
 
 
-    /** Which Model class_name that initialized "model->find(id)".
+    /** Name of Model that initialized "query()->find(id)" action.
+     *
      * @return non-empty-string
      */
     public function model_class_name(): string
     {
-        return (new ReflectionClass( get_called_class() ))->getShortName();
+        return ( new ReflectionClass( get_called_class() ) )->getShortName();
     }
-
 
 }

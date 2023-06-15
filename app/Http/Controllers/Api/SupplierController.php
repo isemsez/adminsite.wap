@@ -6,75 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\ModelCommon;
 use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 
 class SupplierController extends Controller
 {
-    private array $validation_rules;
-
-
-    public function __construct()
-    {
-        $tmp = Supplier::validation_rules;
-        $tmp += [ 'photo' =>
-            [
-                function ($attribute, $value, $fail) {
-                    if ( $value ) {
-                        $photo = Image::make( $value );
-                        $photo_mime = explode( '/', $photo->mime() );
-                        if ( $photo_mime[0] != 'image'
-                            or !in_array( $photo_mime[1],
-                                [ 'jpg', 'jpeg', 'png', 'bmp', 'gif' ] ) ) {
-                            $fail( 'Отправленный вами файл должен быть изображением (jpg,png,gif,bmp).' );
-                        }
-                        // photo comes as string - "reader.readAsDataURL"
-                        if ( strlen( $value ) > 1400000 ) {
-                            $fail( 'Файл больше 1Мб.' );
-                        }
-                    }
-                    return true;
-                }
-            ]
-        ];
-        $this->validation_rules = $tmp;
-    }
-
-    /** Store incoming "create new supplier" form.
-     * @return JsonResponse
-     */
-    public function store(): JsonResponse
-    {
-        $validation = ModelCommon::validate_form_data( $this->validation_rules );
-        if ( !empty( $validation['failed'] ) ) {
-            return $validation['validation_failed_jsonresponse'];
-        }
-
-        $supplier = new Supplier();
-        $supplier->model_load_and_save();
-
-        return response()->json( [ 'message' => 'Данные успешно сохранены.' ], 201 );
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function update(int $id): JsonResponse
-    {
-        $validation = ModelCommon::validate_form_data( $this->validation_rules );
-        if ( !empty($validation['failed']) ) {
-            return $validation['validation_failed_jsonresponse'];
-        }
-
-        $supplier = Supplier::query()->find( $id );
-        $supplier->model_fill_data_and_save();
-
-        return response()->json( [ 'message' => 'Данные успешно обновлены.' ], 202 );
-    }
-
-
     /**
      * List all models of the resource.
      *
@@ -87,22 +23,56 @@ class SupplierController extends Controller
     }
 
 
+    /** Store incoming "create new supplier" form.
+     * @return JsonResponse
+     */
+    public function store(): JsonResponse
+    {
+        $supplier = new Supplier();
+        $validation = $supplier->validate_data( true );
+
+        if ( isset( $validation['failed'] ) ) {
+            return $validation['validation_failed_json_response'];
+        }
+
+        $supplier->model_load_and_save();
+
+        return response()->json( [ 'message' => 'Поставщик успешно сохранен.' ], 201 );
+    }
+
+
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
-        $supplier = Supplier::query()->find( $id );
-        if ( !$supplier ) {
-            return response()->json( [
-                'message' => 'Нет такого поставщика',
-                'error' => "Нет поставщика с id $id.",
-            ], 404 );
-        }
+        $supplier = Supplier::query()->findOrFail( $id );
+
         return response()->json( [ 'message' => 'Успешно!', 'data' => $supplier ] );
+    }
+
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(int $id): JsonResponse
+    {
+        $supplier = Supplier::query()->findOrFail( $id );
+        $validation = $supplier->validate_data();
+
+        if ( isset( $validation['failed'] ) ) {
+            return $validation['validation_failed_json_response'];
+        }
+
+        $supplier->model_load_and_save();
+
+        return response()->json( [ 'message' => 'Данные успешно обновлены.' ], 202 );
     }
 
 
@@ -111,12 +81,22 @@ class SupplierController extends Controller
      *
      * @param int $id
      * @return JsonResponse
-     * @throws \Throwable
      */
     public function destroy(int $id): JsonResponse
     {
-        Supplier::query()->findOrFail( $id )->delete();
-        return response()->json( [ 'message' => 'Поставщик успешно удален.' ] );
+        $supplier = Supplier::query()->findOrFail( $id );
+        $photo_url_path = $supplier['photo'];
+
+        if ( !$supplier->delete() ) {
+            return response()->json( [ 'message' => 'Не удалено!' ], 500 );
+        }
+
+        $photo_path_absolute = public_path() . '/' . $photo_url_path;
+        if ( !unlink( $photo_path_absolute ) ) {
+            Log::notice( "Фото не удалилось - $photo_path_absolute" );
+        }
+
+        return response()->json( [ 'message' => 'Поставщик удален.' ] );
     }
 
 }

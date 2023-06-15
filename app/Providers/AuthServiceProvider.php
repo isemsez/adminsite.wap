@@ -25,10 +25,10 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         Password::defaults( function () {
-            $rule = Password::min(6);
+            $rule = Password::min(6)->rules([ 'required', 'confirmed' ]);
 
             return $this->app->isProduction()
-                ? $rule->mixedCase()->numbers()
+                ? $rule->mixedCase()->numbers()->letters()
                 : $rule;
         });
 

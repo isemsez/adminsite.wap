@@ -36,6 +36,7 @@
                                 <td>{{ employee.name }}</td>
                                 <td><img :src="employee.photo" id="emp_photo" alt="photo"></td>
                                 <td>{{ employee.phone }}</td>
+                                <td>{{ employee.email }}</td>
                                 <td>{{ employee.salary }}</td>
                                 <td>{{ (employee.joining_date.split(' '))[0] }}</td>
                                 <td>
@@ -96,12 +97,20 @@ export default {
     methods: {
         getEmployees() {
             axios.get('api/employee')
-                .then(res => {
-                    this.employees = res.data.employees
+
+                .then( res => {
+                    this.employees = res.data.data
                 })
-                .catch(err => console.log(err.response.data.error))
+
+                .catch( err => {
+                    const message = err.response.data.message;
+                    Toast.fire({icon: "error", title: message, timer: 5000,} )
+
+                    console.log(err.response.data.error);
+                })
         },
         employeeDelete(id) {
+
             Swal.fire({
                 title: 'Вы уверены?',
                 text: "Вы не сможете отменить операцию!",
@@ -110,7 +119,8 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Да, удалить!',
-            }).then((result) => {
+            }).then( (result) => {
+
                 if (result.isConfirmed) {
                     axios.delete('/api/employee/' + id)
                         .then( (res) => {
@@ -125,14 +135,10 @@ export default {
                         })
                         .catch( (err) => {
                             const warning = err.response.data.message
-                            Toast.fire({
-                                icon: "error",
-                                title: warning,
-                                timer: 5000,
-                            })
+                            Toast.fire({icon: "error", title: warning, timer: 5000,} )
+
                             console.log(err.response.data)
                         })
-
                 }
             })
         },
@@ -146,3 +152,4 @@ export default {
     max-width: fit-content;
 }
 </style>
+

@@ -89,8 +89,8 @@
                                                     }}</small>
                                             </div>
                                             <div class="col-md-6">
-                                                <img v-show="form.photo" id="previewImage"
-                                                     :src="form.photo" alt="image"
+                                                <img v-show="imagePath" id="previewImage"
+                                                     :src="imagePath" alt="image"
                                                      style="max-height: 8em; max-width: 100%;"/>
                                             </div>
                                         </div>
@@ -138,33 +138,34 @@ export default {
         getEmployee() {
             let id = this.$route.params.id
             axios.get('/api/employee/'+id)
+
                 .then( (resp) => {
-                    this.form = resp.data.employee
-                    this.imagePath = window.location.origin + resp.data.image_path
+                    this.form = resp.data.data
+                    this.imagePath = window.location.origin + this.form.photo
+                    this.form.photo = null
                 })
+
                 .catch( err => {
+                    const warning = err.response.data.message ?? "Ошибка!"
+                    Toast.fire({icon: "error", title: warning, timer: 5000,} )
+
                     console.log('-')
                     console.log(err.response.data)
                 })},
         editEmployee() {
             let id = this.$route.params.id
             axios.put('/api/employee/'+id, this.form)
-                .then( () => {
-                    this.$router.push({ name: 'employee_index' })
-                    Notification.success()
-                })
-                .catch(err => {
-                    const errors = err.response.data.error;
-                    if (errors) {
-                        this.errors = errors
-                    }
 
-                    const warning = err.response.data.message ?? "Ошибка!";
-                    Toast.fire({
-                        icon: "error",
-                        title: warning,
-                        timer: 5000,
-                    })
+                .then( () => {
+                    Notification.success()
+                    this.$router.push({ name: 'employee_index' })
+                })
+
+                .catch(err => {
+                    this.errors = err.response.data.errors ?? {}
+
+                    const warning = err.response.data.message ?? "Ошибка!"
+                    Toast.fire({icon: "error", title: warning, timer: 5000,} )
 
                     console.log('-')
                     console.log(err.response.data)
@@ -174,12 +175,14 @@ export default {
             const file = event.target.files[0];
             if (file.size > 1048576) {
                 Notification.error('Фото должно быть меньше 1Мб.')
+
             } else {
                 let reader = new FileReader()
                 reader.onload = event => {
                     this.form.photo = event.target.result
                 }
                 reader.readAsDataURL(file)
+
                 this.imagePath = URL.createObjectURL(file)
             }
         }
