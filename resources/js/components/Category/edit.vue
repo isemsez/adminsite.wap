@@ -10,7 +10,7 @@
                         <div class="col-lg-12">
                             <div class="login-form">
                                 <div class="text-center">
-                                    <h1 class="h4 text-gray-900 mb-4">Редактировать поставщика</h1>
+                                    <h1 class="h4 text-gray-900 mb-4">Редактировать категорию</h1>
                                 </div>
                                 <form @submit.prevent="editCategory" class="user" enctype="multipart/form-data">
                                     <div class="form-group">
