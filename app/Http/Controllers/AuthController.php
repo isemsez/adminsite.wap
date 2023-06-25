@@ -109,7 +109,7 @@ class AuthController extends Controller
             'user'         => $user,
         ], $status_code );
     }
-
+//
 
     /**
      * Get the authenticated User.
