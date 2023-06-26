@@ -11,7 +11,16 @@ class Product extends ModelCommon
     use HasFactory;
 
     protected $fillable = [
-        'category_id', 'product_name', 'product_code', 'root', 'buying_price', 'selling_price', 'supplier_id', 'buying_date', 'photo', 'product_quantity',
+        'product_name',
+        'product_code',
+        'root',
+        'category_id',
+        'supplier_id',
+        'buying_price',
+        'selling_price',
+        'buying_date',
+        'photo',
+        'product_quantity',
     ];
 
     protected $hidden = [
@@ -19,26 +28,29 @@ class Product extends ModelCommon
     ];
 
 
-
     /**
      * Validate incoming data.
      *
+     * @param string $scenario
      * @return array|void
      */
-    public function validate(): ?array
+    public static function validate_data(string $scenario = 'store'): ?array
     {
+        $tmp = $scenario == 'update' ? '' : '|unique:products';
+
         $validation_rules = [
-            'product_name' => 'required',
-            'product_code' => 'required|unique:products',
-            'category_id' => 'required|integer',
-            'supplier_id' => 'required|integer',
-            'buying_price' => 'required|float',
-            'selling_price' => 'required|float',
-            'buying_date' => 'required|date',
+            'product_name'     => 'required',
+            'product_code'     => "required{$tmp}",
+            'category_id'      => 'required|integer',
+            'supplier_id'      => 'required|integer',
+            'buying_price'     => 'required|integer',
+            'selling_price'    => 'required|integer',
+            'buying_date'      => 'required|date',
             'product_quantity' => 'required|integer'
         ];
+        $validation_rules += ModelCommon::photo_validation_rule();
 
-        return $this->validate_form_data( $validation_rules );
+        return ModelCommon::validate_form_data( $validation_rules );
     }
 
 
@@ -49,6 +61,6 @@ class Product extends ModelCommon
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class,'category_id','id');
+        return $this->belongsTo(Category::class);
     }
 }

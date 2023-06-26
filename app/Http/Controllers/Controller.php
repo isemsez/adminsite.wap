@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Exception\NotWritableException;
 use Intervention\Image\ImageManagerStatic;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -64,11 +65,28 @@ class Controller extends BaseController
 
     /**
      * Print debug message to terminal.
+     *
      * @param $msg
      * @return void
      */
     public static function print_to_console($msg)
     {
         ( new ConsoleOutput() )->writeln( print_r( $msg, true ) );
+    }
+
+
+    /**
+     * Delete image file.
+     *
+     * @param string $photo_url_path
+     * @return void
+     */
+    public function delete_photo(string $photo_url_path): void
+    {
+        $photo_path_absolute = public_path() . '/' . $photo_url_path;
+
+        if ( !unlink($photo_path_absolute) ) {
+            Log::notice("Фото не удалилось - $photo_path_absolute");
+        }
     }
 }

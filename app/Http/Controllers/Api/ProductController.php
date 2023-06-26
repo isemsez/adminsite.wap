@@ -30,23 +30,21 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return JsonResponse
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @return JsonResponse
      */
-    public function store(int $id)
+    public function store(): JsonResponse
     {
-        //
+        $validator = Product::validate_data();
+        if ( isset($validator['failed']) ) {
+            return $validator['validation_failed_json_response'];
+        }
+
+        $product = new Product();
+        $product->model_load_and_save();
+
+        return response()->json(['message'=>'Успешно сохранено!'], 201);
     }
 
     /**
@@ -70,10 +68,17 @@ class ProductController extends Controller
      * @param Int $id
      * @return JsonResponse
      */
-    public function update(int $id)
+    public function update(int $id): JsonResponse
     {
-        $product = Product::query()->findOrFail($id);
+        $validator = Product::validate_data('update');
+        if ( isset($validator['failed']) ) {
+            return $validator['validation_failed_json_response'];
+        }
 
+        $product = Product::query()->findOrFail($id);
+        $product->model_load_and_save();
+
+        return response()->json(['message'=>'Успешно сохранено!']);
     }
 
     /**
@@ -82,9 +87,24 @@ class ProductController extends Controller
      * @param Int $id
      * @return JsonResponse
      */
-    public function destroy(int $id)
+    public function destroy(int $id): JsonResponse
     {
-        //
+        $product = Product::query()->findOrFail($id);
+        $photo_url_path = $product['photo'];
+
+        if ( !$product->delete() ) {
+            return response()->json([
+                'message' => 'Ошибка, не удалено!',
+                'data'    => ['id' => $id, 'deleted' => false],
+            ],500);
+        }
+
+        $this->delete_photo($photo_url_path);
+
+        return response()->json([
+            'message' => 'Успешно удалено!',
+            'data'    => ['id' => $id, 'deleted' => true]
+        ]);
     }
 
     /**
@@ -104,7 +124,7 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'успешно', 'data' => [
             'categories' => $categoryDropdItems,
-            'suppliers' => $supplierDropdItems
+            'suppliers'  => $supplierDropdItems
         ]]);
     }
 

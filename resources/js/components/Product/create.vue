@@ -135,13 +135,14 @@ export default {
         return {
             form: {
                 product_name: null,
+                product_code: null,
+                root: null,
                 category_id: null,
                 supplier_id: null,
-                product_code: null,
                 buying_price: null,
                 selling_price: null,
                 buying_date: null,
-                buying_quantity: null,
+                product_quantity: null,
                 photo: null,
             },
             imagePath: null,
@@ -176,9 +177,12 @@ export default {
         },
         createProduct() {
             axios.post('/api/product', this.form)
-                .then( () => {
-                    this.$router.push({ name: 'product_index' })
-                    Notification.success()
+                .then( (resp) => {
+                    if ( resp.status === 201 ) {
+
+                        this.$router.push({ name: 'product_index' })
+                        Notification.success()
+                    }
                 })
                 .catch(err => {
                     const errors = err.response.data.error;

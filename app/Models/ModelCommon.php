@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
 use ReflectionClass;
 
 /**
@@ -58,7 +59,6 @@ class ModelCommon extends Model
                 if ( $this->photo ) { // previous photo in db
                     unlink( $_SERVER['DOCUMENT_ROOT'] . $this->photo );
                 }
-
                 $incoming_data['photo'] = $new_photo_url_path;
 
             } else {
@@ -78,5 +78,35 @@ class ModelCommon extends Model
     {
         return ( new ReflectionClass( get_called_class() ) )->getShortName();
     }
+
+
+    /**
+     * Validate incoming photo. Custom rule, closure.
+     *
+     * @return mixed
+     */
+    public static function photo_validation_rule(): array
+    {
+        return [
+            'photo' => function ($attribute, $value, $fail) {
+                if ($value) {
+
+                    $photo_mime = explode('/', Image::make($value)->mime());
+                    if ($photo_mime[0] != 'image'
+                        or !in_array($photo_mime[1],
+                            ['jpg', 'jpeg', 'png', 'bmp', 'gif'])) {
+
+                        $fail('Отправленный вами файл должен быть изображением (jpg,png,bmp,gif).');
+                    }
+                    // photo comes as string - "reader.readAsDataURL"
+                    if (strlen($value) > 1400000) {
+                        $fail('Файл больше 1Мб.');
+                    }
+                }
+                return true;
+            }
+        ];
+    }
+
 
 }

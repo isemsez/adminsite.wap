@@ -104,7 +104,6 @@ class User extends Authenticatable implements JWTSubject
             $rules['password'][] = 'confirmed';
 
             $email = request('email');
-
             $messages += [
                 'name.required'      => 'Заполните ваше имя.',
                 'email.unique'       => "Пользователь $email уже есть.",

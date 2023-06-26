@@ -65,7 +65,7 @@ class CategoryController extends Controller
     public function update(int $id): JsonResponse
     {
         $category = Category::query()->findOrFail( $id );
-        $validation = $category->validate();
+        $validation = $category->validate_data();
 
         if ( isset( $validation['failed'] ) ) {
             return $validation['validation_failed_json_response'];

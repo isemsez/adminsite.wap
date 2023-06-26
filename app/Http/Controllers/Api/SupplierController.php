@@ -84,19 +84,22 @@ class SupplierController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $supplier = Supplier::query()->findOrFail( $id );
+        $supplier = Supplier::query()->findOrFail($id);
         $photo_url_path = $supplier['photo'];
 
         if ( !$supplier->delete() ) {
-            return response()->json( [ 'message' => 'Не удалено!' ], 500 );
+            return response()->json([
+                'message' => 'Ошибка, не удалено!',
+                'data'    => ['id' => $id, 'deleted' => false],
+            ], 500);
         }
 
-        $photo_path_absolute = public_path() . '/' . $photo_url_path;
-        if ( !unlink( $photo_path_absolute ) ) {
-            Log::notice( "Фото не удалилось - $photo_path_absolute" );
-        }
+        $this->delete_photo($photo_url_path);
 
-        return response()->json( [ 'message' => 'Поставщик удален.' ] );
+        return response()->json([
+            'message' => 'Поставщик удален.',
+            'data'    => ['id' => $id, 'deleted' => true]
+        ]);
     }
 
 }
