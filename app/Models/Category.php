@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Http\JsonResponse;
 
 class Category extends ModelCommon
@@ -23,11 +24,12 @@ class Category extends ModelCommon
      *
      * @return array|void
      */
-    public function validate(): ?array
+    public static function validate_data(string $scenario = 'store'): ?array
     {
+        $unique = $scenario == 'update' ? null : 'unique:categories';
         $validation_rules = [
             'category_name' => [
-                'string', 'min:3', 'max:20', function ($attribute, $value, $fail) {
+                'string', 'min:3', 'max:20', $unique, function ($attribute, $value, $fail) {
                     if ( !preg_match( '/^[\p{L} ]+$/u', $value ) ) {
                         $fail( 'Только буквы и пробел.' );
                     }
@@ -35,10 +37,13 @@ class Category extends ModelCommon
             ],
         ];
 
-        return $this->validate_form_data( $validation_rules );
+        return static::validate_form_data( $validation_rules );
     }
 
-    public function product()
+    /**
+     * @return HasOne
+     */
+    public function product(): HasOne
     {
         return $this->hasOne(Product::class);
     }

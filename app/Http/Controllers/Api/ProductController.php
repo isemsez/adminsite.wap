@@ -36,9 +36,9 @@ class ProductController extends Controller
      */
     public function store(): JsonResponse
     {
-        $validator = Product::validate_data();
-        if ( isset($validator['failed']) ) {
-            return $validator['validation_failed_json_response'];
+        $validation = Product::validate_data();
+        if ( isset($validation['failed']) ) {
+            return $validation['validation_failed_json_response'];
         }
 
         $product = new Product();
@@ -56,9 +56,9 @@ class ProductController extends Controller
     public function show(int $id): JsonResponse
     {
         return response()->json(['message' => 'успешно', 'data' => [
-            'product' => Product::query()->findOrFail($id),
-            'categories' => $this->categoryDropdItems(),
-            'suppliers' => $this->supplierDropdItems()
+            'product'    => Product::query()->findOrFail($id),
+            'categories' => $this->categoryDropdwItems(),
+            'suppliers'  => $this->supplierDropdwItems(),
         ]]);
     }
 
@@ -70,15 +70,18 @@ class ProductController extends Controller
      */
     public function update(int $id): JsonResponse
     {
-        $validator = Product::validate_data('update');
-        if ( isset($validator['failed']) ) {
-            return $validator['validation_failed_json_response'];
+        $validation = Product::validate_data('update');
+        if ( isset($validation['failed']) ) {
+            return $validation['validation_failed_json_response'];
         }
 
         $product = Product::query()->findOrFail($id);
         $product->model_load_and_save();
 
-        return response()->json(['message'=>'Успешно сохранено!']);
+        return response()->json([
+            'message' => 'Успешно сохранено!',
+            'data'    => ['id' => $id],
+        ]);
     }
 
     /**
@@ -115,16 +118,16 @@ class ProductController extends Controller
      */
     public function items_category_supplier(): JsonResponse
     {
-        $categoryDropdItems = $this->categoryDropdItems();
-        $supplierDropdItems = $this->supplierDropdItems();
+        $categoryDropdwItems = $this->categoryDropdwItems();
+        $supplierDropdwItems = $this->supplierDropdwItems();
 
-        throw_if(!$categoryDropdItems or $categoryDropdItems == array()
-            or !$supplierDropdItems or $supplierDropdItems == array(),
+        throw_if(!$categoryDropdwItems or $categoryDropdwItems == array()
+            or !$supplierDropdwItems or $supplierDropdwItems == array(),
             'No data in dropdown items.');
 
         return response()->json(['message' => 'успешно', 'data' => [
-            'categories' => $categoryDropdItems,
-            'suppliers'  => $supplierDropdItems
+            'categories' => $categoryDropdwItems,
+            'suppliers'  => $supplierDropdwItems
         ]]);
     }
 
@@ -133,7 +136,7 @@ class ProductController extends Controller
      *
      * @return Collection
      */
-    public function categoryDropdItems(): Collection
+    public function categoryDropdwItems(): Collection
     {
         return Category::query()->get(['id', 'category_name']);
     }
@@ -143,8 +146,9 @@ class ProductController extends Controller
      *
      * @return Collection
      */
-    public function supplierDropdItems(): Collection
+    public function supplierDropdwItems(): Collection
     {
         return Supplier::query()->get(['id', 'shopname']);
     }
 }
+

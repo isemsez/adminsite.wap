@@ -28,13 +28,12 @@ class EmployeeController extends Controller
      */
     public function store(): JsonResponse
     {
-        $employee = new Employee();
-        $validation = $employee->validate_data( true );
-
+        $validation = Employee::validate_data();
         if ( isset( $validation['failed'] ) ) {
             return $validation['validation_failed_json_response'];
         }
 
+        $employee = new Employee();
         $employee->model_load_and_save();
 
         return response()->json( [ 'message' => 'Работник успешно сохранён.' ], 201 );
@@ -52,7 +51,7 @@ class EmployeeController extends Controller
         $employee = Employee::query()->findOrFail( $id );
         $employee['joining_date'] = explode( ' ', $employee['joining_date'] )[0];
 
-        return response()->json( [ 'message' => 'success', 'data' => $employee ] );
+        return response()->json( [ 'message' => 'Успешно!', 'data' => $employee ] );
     }
 
 
@@ -64,16 +63,18 @@ class EmployeeController extends Controller
      */
     public function update(int $id): JsonResponse
     {
-        $employee = Employee::query()->findOrFail( $id );
-        $validation = $employee->validate_data();
-
-        if ( isset( $validation['failed'] ) ) {
+        $validation = Employee::validate_data();
+        if (isset($validation['failed'])) {
             return $validation['validation_failed_json_response'];
         }
 
+        $employee = Employee::query()->findOrFail($id);
         $employee->model_load_and_save();
 
-        return response()->json( [ 'message' => 'Данные успешно обновлены.' ], 202 );
+        return response()->json([
+            'message' => 'Данные успешно обновлены.',
+            'data'    => ['id' => $id],
+        ]);
     }
 
 
@@ -89,7 +90,10 @@ class EmployeeController extends Controller
         $photo_url_path = $employee['photo'];
 
         if ( !$employee->delete() ) {
-            return response()->json( [ 'message' => 'Не удалено!' ], 500 );
+            return response()->json([
+                'message' => 'Не удалено!',
+                'data'    => ['id' => $id, 'deleted' => false],
+            ], 500);
         }
 
         $photo_path_absolute = public_path() . '/' . $photo_url_path;
@@ -98,7 +102,10 @@ class EmployeeController extends Controller
             Log::notice( "Фото не удалилось - $photo_path_absolute" );
         }
 
-        return response()->json( [ 'message' => 'Работник удален.' ] );
+        return response()->json([
+            'message' => 'Работник удален.',
+            'data'    => ['id' => $id, 'deleted' => true],
+        ]);
     }
 
 

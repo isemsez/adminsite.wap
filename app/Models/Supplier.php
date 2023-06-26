@@ -21,24 +21,12 @@ class Supplier extends ModelCommon
     /**
      * Validate incoming form data.
      *
-     * @param bool $email_unique
+     * @param string $scenario
      * @return array|null
      */
-    public function validate_data(bool $email_unique = false): ?array
+    public static function validate_data(string $scenario = 'create'): ?array
     {
-        return $this->validate_form_data( $this->validation_rules( $email_unique ) );
-    }
-
-
-    /**
-     * Get validation rules.
-     *
-     * @param bool $email_unique
-     * @return array
-     */
-    private function validation_rules(bool $email_unique): array
-    {
-        $unique = $email_unique ? 'unique:suppliers' : null;
+        $unique = $scenario == 'update' ? null : 'unique:suppliers';
 
         $validation_rules = [
             'name'     => [ 'required', 'regex:/^[\p{L}\. ]+$/u', 'min:2' ],
@@ -46,28 +34,11 @@ class Supplier extends ModelCommon
             'address'  => [ 'required', 'regex:/^[\p{L},.\d\- ]+$/u', 'min:5' ],
             'shopname' => [ 'required', 'regex:/^[\p{L} ]+$/u', 'min:3' ],
             'phone'    => [ 'required', 'regex:/^\+?([\d\(\)-\. ]|)+$/' ],
+            'photo'    =>   static::photo_validation_rule(),
         ];
 
-        $validation_rules += [
-            'photo' => function ($attribute, $value, $fail) {
-                if ( $value ) {
-
-                    $photo_mime = explode( '/', Image::make( $value )->mime() );
-                    if ( $photo_mime[0] != 'image'
-                        or !in_array( $photo_mime[1],
-                            [ 'jpg', 'jpeg', 'png', 'bmp', 'gif' ] ) ) {
-
-                        $fail( 'Отправленный вами файл должен быть изображением (jpg,png,gif,bmp).' );
-                    }
-                    // photo comes as string - "reader.readAsDataURL"
-                    if ( strlen( $value ) > 1400000 ) {
-                        $fail( 'Файл больше 1Мб.' );
-                    }
-                }
-                return true;
-            }
-        ];
-        return $validation_rules;
+        return static::validate_form_data($validation_rules);
     }
+
 
 }

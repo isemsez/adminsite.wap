@@ -28,13 +28,12 @@ class SupplierController extends Controller
      */
     public function store(): JsonResponse
     {
-        $supplier = new Supplier();
-        $validation = $supplier->validate_data( true );
-
+        $validation = Supplier::validate_data();
         if ( isset( $validation['failed'] ) ) {
             return $validation['validation_failed_json_response'];
         }
 
+        $supplier = new Supplier();
         $supplier->model_load_and_save();
 
         return response()->json( [ 'message' => 'Поставщик успешно сохранен.' ], 201 );
@@ -63,16 +62,18 @@ class SupplierController extends Controller
      */
     public function update(int $id): JsonResponse
     {
-        $supplier = Supplier::query()->findOrFail( $id );
-        $validation = $supplier->validate_data();
-
+        $validation = Supplier::validate_data('update');
         if ( isset( $validation['failed'] ) ) {
             return $validation['validation_failed_json_response'];
         }
 
+        $supplier = Supplier::query()->findOrFail( $id );
         $supplier->model_load_and_save();
 
-        return response()->json( [ 'message' => 'Данные успешно обновлены.' ], 202 );
+        return response()->json([
+            'message' => 'Успешно сохранено.',
+            'data'    => ['id' => $id]
+        ]);
     }
 
 
