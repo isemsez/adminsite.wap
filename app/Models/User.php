@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -25,18 +26,18 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\Laravel\Sanctum\PersonalAccessToken[] $tokens
  * @property-read int|null $tokens_count
- * @method static \Database\Factories\UserFactory factory( ...$parameters )
+ * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User query()
- * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt( $value )
- * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail( $value )
- * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailVerifiedAt( $value )
- * @method static \Illuminate\Database\Eloquent\Builder|User whereId( $value )
- * @method static \Illuminate\Database\Eloquent\Builder|User whereName( $value )
- * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword( $value )
- * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken( $value )
- * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt( $value )
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements JWTSubject
@@ -77,42 +78,41 @@ class User extends Authenticatable implements JWTSubject
     ];
 
 
-    public array $validation_register_rules = [
-        'name'     => [ 'required', 'string', 'max:100' ],
-        'email'    => [ 'required', 'string', 'email', 'max:50', 'unique:users' ],
-    ];
-
-
-    public array $validation_register_messages = [
-        'email.required'     => 'Поле email не заполнено.',
-        'email.max'          => 'Поле email должно быть не длиньше :max символов.',
-        'name.required'      => 'Заполните ваше имя.',
-        'password.required'  => 'Заполните поле пароль.',
-        'password.min'       => 'Минимум :min символов.',
-        'password.confirmed' => 'Проверьте подтверждение пароля.',
-    ];
-
-    public array $validation_login_rules = [
-        'name'     => [ 'required', 'string', 'max:100' ],
-        'email'    => [ 'required', 'string', 'email', 'max:50' ],
-        'password' => [ 'required', 'min:6' ],
-    ];
-
-
-    public array $validation_login_messages = [
-        'email.required'     => 'Поле email не заполнено.',
-        'email.max'          => 'Поле email должно быть не длиньше :max символов.',
-        'password.required'  => 'Заполните поле пароль.',
-        'password.min'       => 'Минимум :min символов.',
-    ];
-
-
-    public function __construct()
+    /**
+     * Validate incoming data.
+     *
+     * @param string $scenario
+     * @return array|null
+     */
+    public static function validate(string $scenario = 'login'): ?array
     {
-        parent::__construct();
-        $this->validation_register_rules['password'] = Password::default();
-        $email = request('email');
-        $this->validation_register_messages += [ 'email.unique' => "Пользователь $email уже есть.", ];
+        $rules = [
+            'email'    => ['required', 'email', 'max:50'],
+            'password' => ['required', Password::default()],
+        ];
+        $messages = [
+            'email.required'    => 'Поле email не заполнено.',
+            'email.max'         => 'Поле email должно быть не длиньше :max символов.',
+            'password.required' => 'Заполните поле пароль.',
+            'password.min'      => 'Минимум :min символов.',
+        ];
+
+        if ($scenario == 'register') {
+
+            $rules['name'] = ['required', 'string', 'max:100'];
+            $rules['email'][] = 'unique:users';
+            $rules['password'][] = 'confirmed';
+
+            $email = request('email');
+
+            $messages += [
+                'name.required'      => 'Заполните ваше имя.',
+                'email.unique'       => "Пользователь $email уже есть.",
+                'password.confirmed' => 'Проверьте подтверждение пароля.',
+            ];
+        }
+
+        return ModelCommon::validate_form_data($rules, $messages);
     }
 
     /**

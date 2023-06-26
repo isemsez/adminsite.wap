@@ -16,6 +16,10 @@ let category_index = require('./components/Category/index.vue').default
 let category_create = require('./components/Category/create.vue').default
 let category_edit = require('./components/Category/edit.vue').default
 
+let product_index = require('./components/Product/index.vue').default
+let product_create = require('./components/Product/create.vue').default
+let product_edit = require('./components/Product/edit.vue').default
+
 
 export const routes = [
     { path: '/', component: login, name: '/' },
@@ -38,4 +42,9 @@ export const routes = [
     { path: '/category-list', component: category_index, name: 'category_index'},
     { path: '/category-create', component: category_create, name: 'category_create'},
     { path: '/category-edit/:id', component: category_edit, name: 'category_edit'},
+
+    // Categories
+    { path: '/product-list', component: product_index, name: 'product_index'},
+    { path: '/product-create', component: product_create, name: 'product_create'},
+    { path: '/product-edit/:id', component: product_edit, name: 'product_edit'},
 ]

@@ -19,14 +19,15 @@ class ModelCommon extends Model
      * Validate incoming form data.
      *
      * @param array $validation_rules
+     * @param array $validation_messages
      * @return array|void
      */
-    public static function validate_form_data(array $validation_rules)
+    public static function validate_form_data(array $validation_rules, array $validation_messages = [])
     {
-        $validator = Validator::make( request()->all(), $validation_rules );
+        $validator = Validator::make( request()->all(), $validation_rules, $validation_messages );
         if ( $validator->fails() ) {
             return [
-                'failed'                          => true,
+                'failed' => true,
                 'validation_failed_json_response' => response()->json( [
                     'message' => 'Проверьте ваши данные.',
                     'errors'  => $validator->errors()
@@ -49,16 +50,16 @@ class ModelCommon extends Model
 
             if ( !empty( $incoming_data['photo'] ) ) {
 
-                $photo_url_path = Controller::save_photo( $incoming_data['photo'],
+                $new_photo_url_path = Controller::save_photo( $incoming_data['photo'],
                     strtolower( $this->model_class_name() )
                 );
 
                 // replacing photo
-                if ( $this->photo ) {
+                if ( $this->photo ) { // previous photo in db
                     unlink( $_SERVER['DOCUMENT_ROOT'] . $this->photo );
                 }
 
-                $incoming_data['photo'] = $photo_url_path;
+                $incoming_data['photo'] = $new_photo_url_path;
 
             } else {
                 unset( $incoming_data['photo'] );  // not to erase existing photo

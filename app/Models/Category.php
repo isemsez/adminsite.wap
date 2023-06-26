@@ -21,9 +21,9 @@ class Category extends ModelCommon
     /**
      * Validate incoming data.
      *
-     * @return JsonResponse|void
+     * @return array|void
      */
-    public function validate(): ?JsonResponse
+    public function validate(): ?array
     {
         $validation_rules = [
             'category_name' => [
@@ -35,11 +35,11 @@ class Category extends ModelCommon
             ],
         ];
 
-        $validator = $this->validate_form_data( $validation_rules );
+        return $this->validate_form_data( $validation_rules );
+    }
 
-        if ( isset( $validator['failed'] ) ) {
-            return $validator['validation_failed_json_response'];
-        }
-
+    public function product()
+    {
+        return $this->hasOne(Product::class);
     }
 }

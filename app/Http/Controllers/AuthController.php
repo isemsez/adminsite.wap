@@ -19,7 +19,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware( 'auth:api', [ 'except' => [ 'login', 'register' ] ] );
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
 
@@ -31,30 +31,19 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $user = new User();
+        $validator = User::validate('register');
 
-        $rules = $user->validation_register_rules;
-        $messages = $user->validation_register_messages;
-
-        $validator = Validator::make( $request->all(), $rules, $messages );
-
-        if ( $validator->fails() ) {
-            return response()->json( [
-                'message' => 'Проверьте ваши данные!',
-                'errors'  => $validator->errors()
-            ], 422 );
+        if (isset($validator['failed'])) {
+            return $validator['validation_failed_json_response'];
         }
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make( $request->password );
+        User::query()->create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-
-        if ( !$user->save() ) {
-            return response()->json( [ 'message' => 'Не удалось сохранить нового пользователя.', ], 500 );
-        }
-
-        return $this->login( 201 );
+        return $this->login(201);
     }
 
 
@@ -66,27 +55,19 @@ class AuthController extends Controller
      */
     public function login(int $status_code = 200): JsonResponse
     {
-        $user = new User();
+        $validator = User::validate();
 
-        $rules = $user->validation_login_rules;
-        $messages = $user->validation_login_messages;
-
-        $validator = Validator::make( request()->all(), $rules, $messages );
-
-        if ( $validator->fails() ) {
-            return response()->json( [
-                'message' => 'Проверьте ваши данные!',
-                'error'   => $validator->errors()
-            ], 422 );
+        if (isset($validator['failed'])) {
+            return $validator['validation_failed_json_response'];
         }
 
-        $credentials = request( [ 'email', 'password' ] );
+        $credentials = request(['email', 'password']);
 
-        if ( !$token = auth()->attempt( $credentials ) ) {
-            return response()->json( [ 'message' => 'Unauthorized' ], 401 );
+        if (!$token = auth()->attempt($credentials)) {
+            return response()->json(['message' => 'Не авторизованы!'], 401);
         }
 
-        return $this->respondWithToken( $token, $status_code );
+        return $this->respondWithToken($token, $status_code);
     }
 
 
@@ -100,16 +81,16 @@ class AuthController extends Controller
     protected function respondWithToken(string $token, int $status_code = 200): JsonResponse
     {
 
-        $user = User::whereEmail( request( 'email' ) )->first();
+        $user = User::whereEmail(request('email'))->first();
 
-        return response()->json( [
+        return response()->json([
             'access_token' => $token,
             'token_type'   => 'bearer',
             'expires_in'   => auth()->factory()->getTTL() * 60,
             'user'         => $user,
-        ], $status_code );
+        ], $status_code);
     }
-//
+
 
     /**
      * Get the authenticated User.
@@ -118,7 +99,7 @@ class AuthController extends Controller
      */
     public function me(): JsonResponse
     {
-        return response()->json( auth()->user() );
+        return response()->json(auth()->user());
     }
 
 
@@ -131,7 +112,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json( [ 'message' => 'Successfully logged out' ] );
+        return response()->json(['message' => 'Successfully logged out']);
     }
 
 
@@ -142,6 +123,6 @@ class AuthController extends Controller
      */
     public function refresh(): JsonResponse
     {
-        return $this->respondWithToken( auth()->refresh() );
+        return $this->respondWithToken(auth()->refresh());
     }
 }

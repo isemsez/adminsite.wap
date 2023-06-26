@@ -32,7 +32,7 @@ class ProductFactory extends Factory
             'selling_price'  => $this->faker->numberBetween(100,1000),
             'buying_date'  => $this->faker->date,
             'product_quantity'  => $this->faker->numberBetween(1,10),
-            'image'  => ( "/$photo_path/" ) . $this->faker->image( public_path( $photo_path ), null, null, null, false ),
+            'photo'  => ( "/$photo_path/" ) . $this->faker->image( public_path( $photo_path ), 320, 240, null, false ),
         ];
     }
 }

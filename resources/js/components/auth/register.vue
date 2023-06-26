@@ -67,12 +67,13 @@ export default {
         register() {
             this.errors = {}
             axios.post('/api/auth/register', this.form)
-                .then(res => {
+                .then( res => {
                     User.responseAfterLogin(res)
                     Toast.fire({
                         icon: 'success',
                         title: 'Успешно зарегистрировались!'
                     })
+                    this.$router.push({ name: 'home' })
                 })
                 .catch(err => {
                     this.errors = err.response.data.errors ?? this.errors

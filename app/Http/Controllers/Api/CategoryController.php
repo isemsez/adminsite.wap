@@ -33,7 +33,7 @@ class CategoryController extends Controller
         $validation = $category->validate();
 
         if ( isset( $validation['failed'] ) ) {
-            return response()->json( [ $validation['validation_failed_json_response'] ] );
+            return $validation['validation_failed_json_response'];
         }
 
         $category->query()->create( $request->all() );
