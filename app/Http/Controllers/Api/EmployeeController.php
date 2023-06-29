@@ -63,7 +63,7 @@ class EmployeeController extends Controller
      */
     public function update(int $id): JsonResponse
     {
-        $validation = Employee::validate_data();
+        $validation = Employee::validate_data('update');
         if (isset($validation['failed'])) {
             return $validation['validation_failed_json_response'];
         }
