@@ -99,7 +99,7 @@ class ProductController extends Controller
             return response()->json([
                 'message' => 'Ошибка, не удалено!',
                 'data'    => ['id' => $id, 'deleted' => false],
-            ],500);
+            ], 500);
         }
 
         $this->delete_photo($photo_url_path);

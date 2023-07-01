@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -84,7 +83,7 @@ class User extends Authenticatable implements JWTSubject
      * @param string $scenario
      * @return array|null
      */
-    public static function validate(string $scenario = 'login'): ?array
+    public static function validate_data(string $scenario = 'login'): ?array
     {
         $rules = [
             'email'    => ['required', 'email', 'max:50'],

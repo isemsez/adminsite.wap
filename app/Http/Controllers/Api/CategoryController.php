@@ -29,13 +29,13 @@ class CategoryController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $category = new Category();
-        $validation = $category->validate();
+        $validation = Category::validate_data();
 
         if ( isset( $validation['failed'] ) ) {
             return $validation['validation_failed_json_response'];
         }
 
+        $category = new Category();
         $category->query()->create( $request->all() );
 
         return response()->json( [ 'message' => 'Новая категория создана' ], 201 );
@@ -64,16 +64,19 @@ class CategoryController extends Controller
      */
     public function update(int $id): JsonResponse
     {
-        $category = Category::query()->findOrFail( $id );
-        $validation = $category->validate_data();
+        $validation = Category::validate_data('update');
 
-        if ( isset( $validation['failed'] ) ) {
+        if ( isset($validation['failed']) ) {
             return $validation['validation_failed_json_response'];
         }
 
+        $category = Category::query()->findOrFail($id);
         $category->model_load_and_save();
 
-        return response()->json( [ 'message' => 'Успешно сохранено.' ],202 );
+        return response()->json([
+            'message' => 'Успешно сохранено.',
+            'data'    => ['id' => $id],
+        ]);
     }
 
 
@@ -86,9 +89,15 @@ class CategoryController extends Controller
     public function destroy(int $id): JsonResponse
     {
         if ( !Category::query()->findOrFail( $id )->delete() ) {
-            return response()->json(['message'=>'Не удалено!'], 501);
+            return response()->json([
+                'message' => 'Не удалено!',
+                'data'    => ['id' => $id, 'deleted' => false]
+            ], 500);
         }
 
-        return response()->json( [ 'message' => 'Успешно удалено.' ] );
+        return response()->json([
+            'message' => 'Успешно удалено.',
+            'data'    => ['id' => $id, 'deleted' => true]
+        ]);
     }
 }

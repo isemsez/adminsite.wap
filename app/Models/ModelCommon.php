@@ -87,25 +87,23 @@ class ModelCommon extends Model
      */
     public static function photo_validation_rule(): array
     {
-        return [
-            'photo' => function ($attribute, $value, $fail) {
-                if ($value) {
+        return function ($attribute, $value, $fail) {
+            if ($value) {
 
-                    $photo_mime = explode('/', Image::make($value)->mime());
-                    if ($photo_mime[0] != 'image'
-                        or !in_array($photo_mime[1],
-                            ['jpg', 'jpeg', 'png', 'bmp', 'gif'])) {
+                $photo_mime = explode('/', Image::make($value)->mime());
+                if ($photo_mime[0] != 'image'
+                    or !in_array($photo_mime[1],
+                        ['jpg', 'jpeg', 'png', 'bmp', 'gif'])) {
 
-                        $fail('Отправленный вами файл должен быть изображением (jpg,png,bmp,gif).');
-                    }
-                    // photo comes as string - "reader.readAsDataURL"
-                    if (strlen($value) > 1400000) {
-                        $fail('Файл больше 1Мб.');
-                    }
+                    $fail('Отправленный вами файл должен быть изображением (jpg,png,bmp,gif).');
                 }
-                return true;
+                // photo comes as string - "reader.readAsDataURL"
+                if (strlen($value) > 1400000) {
+                    $fail('Файл больше 1Мб.');
+                }
             }
-        ];
+            return true;
+        };
     }
 
 

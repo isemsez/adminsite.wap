@@ -46,19 +46,29 @@ class Product extends ModelCommon
             'buying_price'     => 'required|integer',
             'selling_price'    => 'required|integer',
             'buying_date'      => 'required|date',
-            'product_quantity' => 'required|integer'
+            'product_quantity' => 'required|integer',
+            'photo'            => [static::photo_validation_rule()],
         ];
-        $validation_rules += ModelCommon::photo_validation_rule();
 
-        return ModelCommon::validate_form_data( $validation_rules );
+        return static::validate_form_data( $validation_rules );
     }
 
 
+    /**
+     * Retrieve related object.
+     *
+     * @return BelongsTo
+     */
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
     }
 
+    /**
+     * Retrieve related object.
+     *
+     * @return BelongsTo
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

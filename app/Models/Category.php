@@ -41,6 +41,8 @@ class Category extends ModelCommon
     }
 
     /**
+     * Retrieve related object.
+     *
      * @return HasOne
      */
     public function product(): HasOne

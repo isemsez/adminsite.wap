@@ -31,7 +31,7 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $validator = User::validate('register');
+        $validator = User::validate_data('register');
 
         if (isset($validator['failed'])) {
             return $validator['validation_failed_json_response'];
@@ -55,7 +55,7 @@ class AuthController extends Controller
      */
     public function login(int $status_code = 200): JsonResponse
     {
-        $validator = User::validate();
+        $validator = User::validate_data();
 
         if (isset($validator['failed'])) {
             return $validator['validation_failed_json_response'];

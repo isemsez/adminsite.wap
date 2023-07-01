@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 
@@ -29,16 +30,25 @@ class Supplier extends ModelCommon
         $unique = $scenario == 'update' ? null : 'unique:suppliers';
 
         $validation_rules = [
-            'name'     => [ 'required', 'regex:/^[\p{L}\. ]+$/u', 'min:2' ],
-            'email'    => [ 'required', 'email', 'regex:/\.\p{L}{2,6}$/u', 'max:30', $unique ],
-            'address'  => [ 'required', 'regex:/^[\p{L},.\d\- ]+$/u', 'min:5' ],
-            'shopname' => [ 'required', 'regex:/^[\p{L} ]+$/u', 'min:3' ],
-            'phone'    => [ 'required', 'regex:/^\+?([\d\(\)-\. ]|)+$/' ],
-            'photo'    =>   static::photo_validation_rule(),
+            'name'     => ['required', 'regex:/^[\p{L}\. ]+$/u', 'min:2'],
+            'email'    => ['required', 'email', 'regex:/\.\p{L}{2,6}$/u', 'max:30', $unique],
+            'address'  => ['required', 'regex:/^[\p{L},.\d\- ]+$/u', 'min:5'],
+            'shopname' => ['required', 'regex:/^[\p{L} ]+$/u', 'min:3'],
+            'phone'    => ['required', 'regex:/^\+?([\d\(\)-\. ]|)+$/'],
+            'photo'    => [static::photo_validation_rule()],
         ];
 
         return static::validate_form_data($validation_rules);
     }
 
 
+    /**
+     * Retrieve related object.
+     *
+     * @return HasOne
+     */
+    public function product(): HasOne
+    {
+        return $this->hasOne(Product::class);
+    }
 }

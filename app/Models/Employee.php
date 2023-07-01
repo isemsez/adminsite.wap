@@ -33,7 +33,7 @@ class Employee extends ModelCommon
             'salary'       => ['required', 'integer', 'min:100', 'max:10000'],
             'joining_date' => ['required', 'date', 'before:tomorrow'],
             'phone'        => ['required', 'regex:/^\+?([\d\(\)-\. ]|)+$/'],
-            'photo'        =>  static::photo_validation_rule(),
+            'photo'        => [static::photo_validation_rule(),],
         ];
 
         return static::validate_form_data( $validation_rules );
