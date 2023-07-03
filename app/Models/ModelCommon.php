@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Http\Controllers\Controller;
+use Closure;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
@@ -83,9 +84,9 @@ class ModelCommon extends Model
     /**
      * Validate incoming photo. Custom rule, closure.
      *
-     * @return mixed
+     * @return Closure
      */
-    public static function photo_validation_rule(): array
+    public static function photo_validation_rule(): Closure
     {
         return function ($attribute, $value, $fail) {
             if ($value) {
