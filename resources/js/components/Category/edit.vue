@@ -19,8 +19,8 @@
                                                 <input id="category_name" v-model="form.category_name" class="form-control"
                                                        placeholder="Название"
                                                        type="text">
-                                                <small v-if="errors.name" class="text-danger">{{
-                                                        errors.name[0]
+                                                <small v-if="errors.category_name" class="text-danger">{{
+                                                        errors.category_name[0]
                                                     }}</small>
                                             </div>
                                         </div>
@@ -62,6 +62,7 @@ export default {
     methods: {
         getCategory() {
             let id = this.$route.params.id
+
             axios.get('/api/category/'+id)
                 .then( (resp) => {
                     this.form = resp.data.data
@@ -69,6 +70,7 @@ export default {
                 .catch( err => {
                     this.errors = err.response.data.errors ?? this.errors
                     const warning = err.response.data.error ?? "Ошибка!";
+
                     Toast.fire({
                         icon: "error",
                         title: warning,
@@ -79,19 +81,27 @@ export default {
         },
         editCategory() {
             const id = this.$route.params.id
+
             axios.put('/api/category/'+id, this.form)
-                .then( (res) => {
-                    Notification.success(res.data.message)
-                    this.$router.push({ name: 'category_index' })
+                .then( res => {
+                    if ( id == res.data.data.id ) {
+                        Notification.success(res.data.message)
+                        this.$router.push({name: 'category_index'})
+
+                    } else {
+                        Notification.warning()
+                    }
                 })
-                .catch(err => {
-                    this.errors = err.response.data.errors ?? this.errors
+                .catch( err => {
+                    this.errors = err.response.data.errors ?? {}
                     const warning = err.response.data.message ?? "Ошибка!";
+
                     Toast.fire({
                         icon: "error",
                         title: warning,
                         timer: 5000,
                     })
+
                     console.log('-', err.response.data)
                 })
         }

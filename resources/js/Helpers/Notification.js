@@ -5,7 +5,7 @@ class Notification {
             type: "success",
             layout: "topRight",
             text: txt,
-            timeout: 5000,
+            timeout: 3000,
         }).show()
     }
 

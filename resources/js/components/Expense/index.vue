@@ -3,7 +3,7 @@
         <div class="row mb-2">
             <div class="col">
                 <router-link class="btn btn-primary col-sm-5 col-md-4 col-lg-2"
-                             :to="{ name: 'employee_create' }"> Создать работника
+                             :to="{ name: 'expense_create' }">Добавить статью расхода
                 </router-link>
                 <span class="px-3"></span>
                 <input type="text" id="search" class="form-control-sm col-md-4"
@@ -16,33 +16,27 @@
                 <!-- Simple Tables -->
                 <div class="card">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Список работников</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Список расходов</h6>
                     </div>
                     <div class="table-responsive">
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
                             <tr>
-                                <th>Имя</th>
-                                <th>Фото</th>
-                                <th>Номер телефона</th>
-                                <th>Почта</th>
-                                <th>Зарплата</th>
-                                <th>Устроился(ась) на работу</th>
+                                <th>Детали</th>
+                                <th>Сумма</th>
+                                <th>Дата</th>
                                 <th>Действие</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="employee in filtered" :key="employee.id">
-                                <td>{{ employee.name }}</td>
-                                <td><img :src="employee.photo" class="photo" alt="photo"></td>
-                                <td>{{ employee.phone }}</td>
-                                <td>{{ employee.email }}</td>
-                                <td>{{ employee.salary }}</td>
-                                <td>{{ (employee.joining_date.split(' '))[0] }}</td>
+                            <tr v-for="expense in filtered" :key="expense.id">
+                                <td>{{ expense.details }}</td>
+                                <td>{{ expense.amount }}</td>
+                                <td>{{ expense.expense_date }}</td>
                                 <td>
-                                    <router-link :to="{ name: 'employee_edit', params: { id: employee.id } }" class="btn btn-sm btn-primary">
+                                    <router-link :to="{ name: 'expense_edit', params: { id: expense.id } }" class="btn btn-sm btn-primary">
                                         Редактировать</router-link>
-                                    <a @click="employeeDelete(employee.id)" class="btn btn-sm btn-danger">Удалить</a>
+                                    <a @click="expenseDelete(expense.id)" class="btn btn-sm btn-danger">Удалить</a>
                                 </td>
                             </tr>
                             </tbody>
@@ -59,31 +53,29 @@
 <script>
 export default {
     created() {
-        if (!User.loggedIn()) {
+        if (! User.loggedIn() ) {
             this.$router.push({name: '/'})
         } else
-            this.getEmployees()
+            this.getExpenses()
     },
     data() {
         return {
-            employees: [],
+            expenses: [],
             searchBox: '',
         }
     },
     computed: {
         filtered() {
-            let search_str = this.searchBox
+            const search_str = this.searchBox;
+
             if (!search_str) {
-                return this.employees
+                return this.expenses
             }
 
-            return this.employees.filter( (employee) => {
-                for (const prop in employee) {
-                    if (prop === 'id' || prop === 'photo') {
-                        continue
-                    }
-                    if (employee[prop] && employee[prop].toString().toUpperCase()
-                        .match(search_str.toUpperCase()) ) {
+            return this.expenses.filter( (expense) => {
+                for (const key in expense) {
+                    if (key !== 'id' && expense[key]
+                        && expense[key].toString().toUpperCase().match(search_str.toUpperCase()) ) {
                         return true
                     }
                 }
@@ -92,22 +84,23 @@ export default {
         },
     },
     methods: {
-        getEmployees() {
-            axios.get('api/employee')
-
-                .then( res => {
-                    this.employees = res.data.data
+        getExpenses() {
+            axios.get('api/expense')
+                .then(res => {
+                    const tmp = res.data.data
+                    if ( tmp && typeof tmp==='object' ) {
+                        this.expenses = res.data.data
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: "Пришел неверный ответ!",
+                            timer: 5000,
+                        })
+                    }
                 })
-
-                .catch( err => {
-                    const message = err.response.data.message;
-                    Toast.fire({icon: "error", title: message, timer: 5000,} )
-
-                    console.log(err.response.data.error);
-                })
+                .catch( err => console.log(err.response.data.error))
         },
-        employeeDelete(id) {
-
+        expenseDelete(id) {
             Swal.fire({
                 title: 'Вы уверены?',
                 text: "Вы не сможете отменить операцию!",
@@ -116,24 +109,26 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Да, удалить!',
-            }).then( (result) => {
-
-                if (result.isConfirmed) {
-                    axios.delete('/api/employee/' + id)
+            }).then( (res) => {
+                if (res.isConfirmed) {
+                    axios.delete('/api/expense/' + id)
                         .then( (res) => {
                             Swal.fire(
-                                'Удален!',
+                                'Удалён!',
                                 res.data.message,
                                 'success'
                             )
-                            this.employees = this.employees.filter( (employee) => {
-                                return employee.id !== id
+                            this.expenses = this.expenses.filter( (expense) => {
+                                return expense.id !== id
                             })
                         })
                         .catch( (err) => {
                             const warning = err.response.data.message
-                            Toast.fire({icon: "error", title: warning, timer: 5000,} )
-
+                            Toast.fire({
+                                icon: "error",
+                                title: warning,
+                                timer: 5000,
+                            })
                             console.log(err.response.data)
                         })
                 }
@@ -144,9 +139,5 @@ export default {
 </script>
 
 <style scoped>
-.photo {
-    max-height: 3rem;
-    max-width: 5rem;
-}
-</style>
 
+</style>

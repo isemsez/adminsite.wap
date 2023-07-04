@@ -8,7 +8,6 @@
                 <span class="px-3"></span>
                 <input type="text" id="search" class="form-control-sm col-md-4"
                        v-model="searchBox" placeholder="Поиск">
-                <label for="search">{{ str_length }}</label>
             </div>
         </div>
 
@@ -23,17 +22,17 @@
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
                             <tr>
-                                <th>Name</th>
-                                <th>Photo</th>
-                                <th>Phone number</th>
-                                <th>Shop name</th>
-                                <th>Action</th>
+                                <th>Имя</th>
+                                <th>Фото</th>
+                                <th>Номер телефона</th>
+                                <th>Название организации</th>
+                                <th>Действие</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr v-for="supplier in filtered" :key="supplier.id">
                                 <td>{{ supplier.name }}</td>
-                                <td><img :src="supplier.photo" id="emp_photo" alt="photo"></td>
+                                <td><img :src="supplier.photo" class="photo" alt="photo"></td>
                                 <td>{{ supplier.phone }}</td>
                                 <td>{{ supplier.shopname }}</td>
                                 <td>
@@ -68,10 +67,6 @@ export default {
         }
     },
     computed: {
-        str_length() {
-            const length = this.searchBox.length;
-            return length ? length : ''
-        },
         filtered() {
             const search_str = this.searchBox;
 
@@ -82,7 +77,7 @@ export default {
             return this.suppliers.filter( (supplier) => {
                 for (const key in supplier) {
                     if (key !== 'id' && key !== 'photo' && supplier[key]
-                        && supplier[key].toString().match(search_str) ) {
+                        && supplier[key].toString().toUpperCase().match(search_str.toUpperCase()) ) {
                         return true
                     }
                 }
@@ -146,7 +141,7 @@ export default {
 </script>
 
 <style scoped>
-#emp_photo {
+.photo {
     max-height: 3rem;
     max-width: 5rem;
 }

@@ -8,7 +8,6 @@
                 <span class="px-3"></span>
                 <input type="text" id="search" class="form-control-sm col-md-4"
                        v-model="searchBox" placeholder="Поиск">
-                <label for="search">{{ str_length }}</label>
             </div>
         </div>
 
@@ -28,12 +27,13 @@
                                 <th>Категория</th>
                                 <th>Поставщик</th>
                                 <th>Розничная цена</th>
+                                <th>Действие</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr v-for="product in filtered" :key="product.id">
                                 <td>{{ product.product_name }}</td>
-                                <td><img :src="product.photo" id="photo" alt="photo"></td>
+                                <td><img :src="product.photo" class="photo" alt="photo"></td>
                                 <td>{{ product.category_name }}</td>
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.selling_price }}</td>
@@ -69,10 +69,6 @@ export default {
         }
     },
     computed: {
-        str_length() {
-            const length = this.searchBox.length;
-            return length ? length : ''
-        },
         filtered() {
             const search_str = this.searchBox;
 
@@ -83,7 +79,7 @@ export default {
             return this.products.filter( (product) => {
                 for (const key in product) {
                     if (key !== 'id' && key !== 'photo' && product[key]
-                        && product[key].toString().match(search_str) ) {
+                        && product[key].toString().toUpperCase().match(search_str.toUpperCase()) ) {
                         return true
                     }
                 }
@@ -147,7 +143,7 @@ export default {
 </script>
 
 <style scoped>
-#photo {
+.photo {
     max-height: 3rem;
     max-width: 5rem;
 }

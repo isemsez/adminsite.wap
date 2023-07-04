@@ -16,7 +16,7 @@ class CategoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categories = Category::query()->get();
+        $categories = Category::query()->orderByDesc('id')->get();
         return response()->json( [ 'message' => 'Успешно.', 'data' => $categories ] );
     }
 
@@ -30,7 +30,6 @@ class CategoryController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validation = Category::validate_data();
-
         if ( isset( $validation['failed'] ) ) {
             return $validation['validation_failed_json_response'];
         }

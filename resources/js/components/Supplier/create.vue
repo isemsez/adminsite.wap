@@ -124,8 +124,15 @@ export default {
         createSupplier() {
             axios.post('/api/supplier', this.form)
                 .then( () => {
-                    this.$router.push({ name: 'supplier_index' })
-                    Notification.success()
+
+                    if ( res.status == 201 ) {
+                        this.$router.push({ name: 'supplier_index' })
+                        Notification.success()
+
+                    } else {
+                        Notification.warning()
+                        this.errors = {}
+                    }
                 })
                 .catch(err => {
                     const errors = err.response.data.error;

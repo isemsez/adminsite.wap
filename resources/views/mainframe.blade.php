@@ -40,14 +40,14 @@
                  <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap"
                     aria-expanded="true" aria-controls="collapseBootstrap">
                      <i class="far fa-fw fa-window-maximize"></i>
-                     <span>Employee</span>
+                     <span>Работник</span>
                  </a>
                  <div id="collapseBootstrap" class="collapse" aria-labelledby="headingBootstrap"
                       data-parent="#accordionSidebar">
                      <div class="bg-white py-2 collapse-inner rounded">
-                         <h6 class="collapse-header">Employee</h6>
-                         <router-link class="collapse-item" :to="{ name: 'employee_index' }">All Employees</router-link>
-                         <router-link class="collapse-item" :to="{ name: 'employee_create' }">Add Employee</router-link>
+                         <h6 class="collapse-header">Работники</h6>
+                         <router-link class="collapse-item" :to="{ name: 'employee_index' }">Список работников</router-link>
+                         <router-link class="collapse-item" :to="{ name: 'employee_create' }">Добавить работника</router-link>
                      </div>
                  </div>
              </li>
@@ -55,14 +55,14 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap2"
                    aria-expanded="true" aria-controls="collapseBootstrap2">
                     <i class="far fa-fw fa-window-maximize"></i>
-                    <span>Supplier</span>
+                    <span>Поставщик</span>
                 </a>
                 <div id="collapseBootstrap2" class="collapse" aria-labelledby="headingBootstrap2"
                      data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Supplier</h6>
-                        <router-link class="collapse-item" :to="{ name: 'supplier_index' }">All Suppliers</router-link>
-                        <router-link class="collapse-item" :to="{ name: 'supplier_create' }">Add Supplier</router-link>
+                        <h6 class="collapse-header">Поставщики</h6>
+                        <router-link class="collapse-item" :to="{ name: 'supplier_index' }">Список поставщиков</router-link>
+                        <router-link class="collapse-item" :to="{ name: 'supplier_create' }">Добавить поставщика</router-link>
                     </div>
                 </div>
             </li>
@@ -70,14 +70,14 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap3"
                    aria-expanded="true" aria-controls="collapseBootstrap3">
                     <i class="far fa-fw fa-window-maximize"></i>
-                    <span>Category</span>
+                    <span>Категория</span>
                 </a>
                 <div id="collapseBootstrap3" class="collapse" aria-labelledby="headingBootstrap3"
                      data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Caategory</h6>
-                        <router-link class="collapse-item" :to="{ name: 'category_index' }">All Categories</router-link>
-                        <router-link class="collapse-item" :to="{ name: 'category_create' }">Add Category</router-link>
+                        <h6 class="collapse-header">Категории</h6>
+                        <router-link class="collapse-item" :to="{ name: 'category_index' }">Список категорий</router-link>
+                        <router-link class="collapse-item" :to="{ name: 'category_create' }">Добавить категории</router-link>
                     </div>
                 </div>
             </li>
@@ -85,14 +85,29 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap4"
                    aria-expanded="true" aria-controls="collapseBootstrap4">
                     <i class="far fa-fw fa-window-maximize"></i>
-                    <span>Product</span>
+                    <span>Товар</span>
                 </a>
                 <div id="collapseBootstrap4" class="collapse" aria-labelledby="headingBootstrap4"
                      data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Product</h6>
-                        <router-link class="collapse-item" :to="{ name: 'product_index' }">All Products</router-link>
-                        <router-link class="collapse-item" :to="{ name: 'product_create' }">Add Products</router-link>
+                        <h6 class="collapse-header">Товары</h6>
+                        <router-link class="collapse-item" :to="{ name: 'product_index' }">Все товары</router-link>
+                        <router-link class="collapse-item" :to="{ name: 'product_create' }">Добавить товар</router-link>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap5"
+                   aria-expanded="true" aria-controls="collapseBootstrap5">
+                    <i class="far fa-fw fa-window-maximize"></i>
+                    <span>Расходы</span>
+                </a>
+                <div id="collapseBootstrap5" class="collapse" aria-labelledby="headingBootstrap5"
+                     data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Расходы</h6>
+                        <router-link class="collapse-item" :to="{ name: 'expense_index' }">Все расходы</router-link>
+                        <router-link class="collapse-item" :to="{ name: 'expense_create' }">Добавить статью расхода</router-link>
                     </div>
                 </div>
             </li>

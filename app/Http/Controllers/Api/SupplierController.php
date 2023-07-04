@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\ModelCommon;
 use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
-use Intervention\Image\Facades\Image;
 
 class SupplierController extends Controller
 {
@@ -18,7 +15,7 @@ class SupplierController extends Controller
      */
     public function index(): JsonResponse
     {
-        $suppliers = Supplier::all();
+        $suppliers = Supplier::query()->orderByDesc('id')->get(['id','name','shopname','photo','phone']);
         return response()->json( [ 'message' => 'Список поставщиков', 'data' => $suppliers ] );
     }
 

@@ -159,6 +159,7 @@ export default {
             axios.get('/api/product/'+id)
                 .then( (resp) => {
                     let product_data = resp.data.data.product
+
                     if (product_data.photo != null) {
                         this.imagePath = window.location.origin + product_data.photo
                         delete product_data.photo
@@ -171,46 +172,60 @@ export default {
                 .catch( err => {
                     this.errors = err.response.data.errors ?? this.errors
                     const warning = err.response.data.message ?? "Ошибка!";
+
                     Toast.fire({
                         icon: "error",
                         title: warning,
                         timer: 5000,
                     })
+
                     console.log('-', err.response.data)
                 })
         },
         editProduct() {
             let id = this.$route.params.id
             let uploading_data = this.form
+
             if (uploading_data.photo === null) {
                 delete uploading_data.photo
             }
+
             axios.put('/api/product/'+id, uploading_data)
-                .then( (res) => {
-                    Notification.success(res.data.message)
-                    this.$router.push({ name: 'product_index' })
+                .then( res => {
+                    if ( id == res.data.data.id ) {
+                        Notification.success(res.data.message)
+                        this.$router.push({name: 'product_index'})
+
+                    } else {
+                        Notification.warning()
+                    }
                 })
                 .catch(err => {
                     this.errors = err.response.data.errors ?? this.errors
                     const warning = err.response.data.message ?? "Ошибка!";
+
                     Toast.fire({
                         icon: "error",
                         title: warning,
                         timer: 5000,
                     })
+
                     console.log('-', err.response.data)
                 })
         },
         onImageSelect(event) {
             const file = event.target.files[0];
+
             if (file.size > 1*1024*1024) {
                 Notification.error("Фото должно быть меньше 1Мб.")
+
             } else {
                 let reader = new FileReader()
                 reader.onload = event => {
                     this.form.photo = event.target.result
                 }
                 reader.readAsDataURL(file)
+
                 this.imagePath = URL.createObjectURL(file)
             }
         }

@@ -135,14 +135,18 @@ export default {
     methods: {
         createEmployee() {
             axios.post('/api/employee', this.form)
-                .then(res => {
-                    this.$router.push({ name: 'employee_index' })
-                    Notification.success()
+                .then( res => {
 
-                    console.log('+')
-                    console.log(res.data)
+                    if ( res.status == 201 ) {
+                        this.$router.push({ name: 'employee_index' })
+                        Notification.success()
+
+                    } else {
+                        Notification.warning()
+                        this.errors = {}
+                    }
                 })
-                .catch(err => {
+                .catch( err => {
                     this.errors = err.response.data.errors ?? {}
 
                     const warning = err.response.data.message ?? "Ошибка!";
@@ -152,12 +156,12 @@ export default {
                         timer: 5000,
                     })
 
-                    console.log('-')
-                    console.log(err.response.data)
+                    console.log('-', err.response.data)
                 })
         },
         onImageSelect(event) {
             const file = event.target.files[0];
+
             if (file.size > 1048576) {
                 Notification.error('Фото должно быть меньше 1Мб.')
             } else {
@@ -166,6 +170,7 @@ export default {
                     this.form.photo = event.target.result
                 }
                 reader.readAsDataURL(file)
+
                 this.imagePath = URL.createObjectURL(file)
             }
         },

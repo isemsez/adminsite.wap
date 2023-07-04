@@ -178,10 +178,14 @@ export default {
         createProduct() {
             axios.post('/api/product', this.form)
                 .then( (resp) => {
-                    if ( resp.status === 201 ) {
 
+                    if ( res.status == 201 ) {
                         this.$router.push({ name: 'product_index' })
                         Notification.success()
+
+                    } else {
+                        Notification.warning()
+                        this.errors = {}
                     }
                 })
                 .catch(err => {

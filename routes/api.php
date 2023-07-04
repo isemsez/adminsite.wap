@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\EmployeeController;
@@ -43,3 +44,4 @@ Route::apiResource( '/supplier', SupplierController::class );
 Route::apiResource( 'category', CategoryController::class );
 Route::apiResource( '/product', ProductController::class );
 Route::get('/items-categ-supp', [ProductController::class,'items_category_supplier']);
+Route::apiResource('/expense', ExpenseController::class);

@@ -137,9 +137,9 @@ export default {
     methods: {
         getEmployee() {
             let id = this.$route.params.id
-            axios.get('/api/employee/'+id)
 
-                .then( (resp) => {
+            axios.get('/api/employee/'+id)
+                .then( resp => {
                     this.form = resp.data.data
                     this.imagePath = window.location.origin + this.form.photo
                     this.form.photo = null
@@ -147,18 +147,21 @@ export default {
 
                 .catch( err => {
                     const warning = err.response.data.message ?? "Ошибка!"
-                    Toast.fire({icon: "error", title: warning, timer: 5000,} )
+                    Toast.fire({icon: "error", title: warning, timer: 5000,})
 
-                    console.log('-')
-                    console.log(err.response.data)
+                    console.log('- ' + err.response.data)
                 })},
         editEmployee() {
             let id = this.$route.params.id
             axios.put('/api/employee/'+id, this.form)
 
-                .then( () => {
-                    Notification.success()
-                    this.$router.push({ name: 'employee_index' })
+                .then( res => {
+                    if ( id == res.data.data.id ) {
+                        Notification.success(res.data.message)
+                        this.$router.push({name: 'employee_index'})
+                    } else {
+                        Notification.warning()
+                    }
                 })
 
                 .catch(err => {

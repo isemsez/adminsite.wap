@@ -59,14 +59,18 @@ export default {
         createCategory() {
             axios.post('/api/category', this.form)
                 .then( () => {
-                    this.$router.push({ name: 'category_index' })
-                    Notification.success()
+
+                    if (res.status == 201) {
+                        this.$router.push({name: 'category_index'})
+                        Notification.success()
+
+                    } else {
+                        Notification.warning()
+                        this.errors = {}
+                    }
                 })
                 .catch(err => {
-                    const errors = err.response.data.error;
-                    if (errors) {
-                        this.errors = errors
-                    }
+                    this.errors = err.response.data.error ?? {}
 
                     const warning = err.response.data.message ?? "Ошибка!";
                     Toast.fire({
@@ -75,8 +79,7 @@ export default {
                         timer: 5000,
                     })
 
-                    console.log('-')
-                    console.log(err.response.data)
+                    console.log('-', err.response.data)
                 })
         }
     }

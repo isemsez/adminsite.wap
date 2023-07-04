@@ -124,45 +124,58 @@ export default {
     methods: {
         getSupplier() {
             let id = this.$route.params.id
+
             axios.get('/api/supplier/'+id)
                 .then( (resp) => {
                     let incoming_data = resp.data.data
+
                     if (incoming_data.photo != null) {
                         this.imagePath = window.location.origin + incoming_data.photo
                         delete incoming_data.photo
                     }
+
                     this.form = incoming_data
                 })
                 .catch( err => {
                     this.errors = err.response.data.errors ?? this.errors
                     const warning = err.response.data.error ?? "Ошибка!";
+
                     Toast.fire({
                         icon: "error",
                         title: warning,
                         timer: 5000,
                     })
+
                     console.log('-', err.response.data)
                 })
         },
         editSupplier() {
             let id = this.$route.params.id
             let uploading_data = this.form
+
             if (uploading_data.photo === null) {
                 delete uploading_data.photo
             }
             axios.put('/api/supplier/'+id, uploading_data)
-                .then( (res) => {
-                    Notification.success(res.data.message)
-                    this.$router.push({ name: 'supplier_index' })
+                .then( res => {
+                    if ( id == res.data.data.id ) {
+                        Notification.success(res.data.message)
+                        this.$router.push({name: 'supplier_index'})
+
+                    } else {
+                        Notification.warning()
+                    }
                 })
-                .catch(err => {
+                .catch( err => {
                     this.errors = err.response.data.errors ?? this.errors
                     const warning = err.response.data.message ?? "Ошибка!";
+
                     Toast.fire({
                         icon: "error",
                         title: warning,
                         timer: 5000,
                     })
+
                     console.log('-', err.response.data)
                 })
         },
@@ -170,12 +183,14 @@ export default {
             const file = event.target.files[0];
             if (file.size > 1*1024*1024) {
                 Notification.error("Фото должно быть меньше 1Мб.")
+
             } else {
                 let reader = new FileReader()
                 reader.onload = event => {
                     this.form.photo = event.target.result
                 }
                 reader.readAsDataURL(file)
+
                 this.imagePath = URL.createObjectURL(file)
             }
         }

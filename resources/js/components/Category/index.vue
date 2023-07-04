@@ -8,7 +8,6 @@
                 <span class="px-3"></span>
                 <input type="text" id="search" class="form-control-sm col-md-4"
                        v-model="searchBox" placeholder="Поиск">
-                <label for="search">{{ str_length }}</label>
             </div>
         </div>
 
@@ -23,8 +22,8 @@
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
                             <tr>
-                                <th>Name</th>
-                                <th>Action</th>
+                                <th>Название</th>
+                                <th>Действие</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -62,10 +61,6 @@ export default {
         }
     },
     computed: {
-        str_length() {
-            const length = this.searchBox.length;
-            return length ? length : ''
-        },
         filtered() {
             const search_str = this.searchBox;
 
@@ -76,7 +71,7 @@ export default {
             return this.categories.filter( (category) => {
                 for (const key in category) {
                     if (key !== 'id' && category[key]
-                        && category[key].toString().match(search_str) ) {
+                        && category[key].toString().toUpperCase().match(search_str.toUpperCase()) ) {
                         return true
                     }
                 }
