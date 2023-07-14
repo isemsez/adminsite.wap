@@ -69,17 +69,9 @@ export default {
                         this.errors = {}
                     }
                 })
-                .catch(err => {
-                    this.errors = err.response.data.error ?? {}
-
-                    const warning = err.response.data.message ?? "Ошибка!";
-                    Toast.fire({
-                        icon: "error",
-                        title: warning,
-                        timer: 5000,
-                    })
-
-                    console.log('-', err.response.data)
+                .catch( err => {
+                    this.errors = err.response.data.errors ?? {}
+                    Helper.warn( err.response.data )
                 })
         }
     }

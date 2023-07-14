@@ -94,17 +94,8 @@ export default {
     methods: {
         getEmployees() {
             axios.get('api/employee')
-
-                .then( res => {
-                    this.employees = res.data.data
-                })
-
-                .catch( err => {
-                    const message = err.response.data.message;
-                    Toast.fire({icon: "error", title: message, timer: 5000,} )
-
-                    console.log(err.response.data.error);
-                })
+                .then( res => this.employees = res.data.data )
+                .catch( err => Helper.warn( err.response.data) )
         },
         employeeDelete(id) {
 
@@ -130,12 +121,7 @@ export default {
                                 return employee.id !== id
                             })
                         })
-                        .catch( (err) => {
-                            const warning = err.response.data.message
-                            Toast.fire({icon: "error", title: warning, timer: 5000,} )
-
-                            console.log(err.response.data)
-                        })
+                        .catch( err => Helper.warn( err.response.data) )
                 }
             })
         },

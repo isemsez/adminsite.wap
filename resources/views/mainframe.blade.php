@@ -112,6 +112,21 @@
                 </div>
             </li>
             <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap6"
+                   aria-expanded="true" aria-controls="collapseBootstrap6">
+                    <i class="far fa-fw fa-window-maximize"></i>
+                    <span>Зарплата</span>
+                </a>
+                <div id="collapseBootstrap6" class="collapse" aria-labelledby="headingBootstrap6"
+                     data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Зарплата</h6>
+                        <router-link class="collapse-item" :to="{ name: 'salary' }">Все зарплаты</router-link>
+                        <router-link class="collapse-item" :to="{ name: 'given_salary' }">Заплатить зарплату</router-link>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="forms.html">
                     <i class="fab fa-fw fa-wpforms"></i>
                     <span>Forms</span>

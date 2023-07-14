@@ -94,17 +94,7 @@ export default {
                 .then((resp) => {
                     this.form = resp.data.data
                 })
-                .catch(err => {
-                    this.errors = err.response.data.errors ?? this.errors
-                    const warning = err.response.data.error ?? "Ошибка!";
-
-                    Toast.fire({
-                        icon: "error",
-                        title: warning,
-                        timer: 5000,
-                    })
-                    console.log('-', err.response.data)
-                })
+                .catch( err => Helper.warn( err.response.data ) )
         },
         editExpense() {
             const id = this.$route.params.id
@@ -119,16 +109,9 @@ export default {
                         Notification.warning()
                     }
                 })
-                .catch(err => {
+                .catch( err => {
                     this.errors = err.response.data.errors ?? {}
-                    const warning = err.response.data.message ?? "Ошибка!";
-
-                    Toast.fire({
-                        icon: "error",
-                        title: warning,
-                        timer: 5000,
-                    })
-                    console.log('-', err.response.data)
+                    Helper.warn( err.response.data )
                 })
         }
     }

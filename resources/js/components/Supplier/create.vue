@@ -123,9 +123,9 @@ export default {
     methods: {
         createSupplier() {
             axios.post('/api/supplier', this.form)
-                .then( () => {
+                .then( (res) => {
 
-                    if ( res.status == 201 ) {
+                    if ( res.status === 201 ) {
                         this.$router.push({ name: 'supplier_index' })
                         Notification.success()
 
@@ -134,21 +134,9 @@ export default {
                         this.errors = {}
                     }
                 })
-                .catch(err => {
-                    const errors = err.response.data.error;
-                    if (errors) {
-                        this.errors = errors
-                    }
-
-                    const warning = err.response.data.message ?? "Ошибка!";
-                    Toast.fire({
-                        icon: "error",
-                        title: warning,
-                        timer: 5000,
-                    })
-
-                    console.log('-')
-                    console.log(err.response.data)
+                .catch( err => {
+                    this.errors = err.response.data.errors ?? {};
+                    Helper.warn( err.response.data )
                 })
         },
         onImageSelect(event) {

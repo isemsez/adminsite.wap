@@ -139,18 +139,13 @@ export default {
             let id = this.$route.params.id
 
             axios.get('/api/employee/'+id)
-                .then( resp => {
-                    this.form = resp.data.data
+                .then( res => {
+                    this.form = res.data.data
                     this.imagePath = window.location.origin + this.form.photo
                     this.form.photo = null
                 })
-
-                .catch( err => {
-                    const warning = err.response.data.message ?? "Ошибка!"
-                    Toast.fire({icon: "error", title: warning, timer: 5000,})
-
-                    console.log('- ' + err.response.data)
-                })},
+                .catch( err => Helper.warn( err.response.data ) )
+        },
         editEmployee() {
             let id = this.$route.params.id
             axios.put('/api/employee/'+id, this.form)
@@ -163,15 +158,9 @@ export default {
                         Notification.warning()
                     }
                 })
-
-                .catch(err => {
+                .catch( err => {
                     this.errors = err.response.data.errors ?? {}
-
-                    const warning = err.response.data.message ?? "Ошибка!"
-                    Toast.fire({icon: "error", title: warning, timer: 5000,} )
-
-                    console.log('-')
-                    console.log(err.response.data)
+                    Helper.warn( err.response.data )
                 })
         },
         onImageSelect(event) {

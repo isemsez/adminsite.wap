@@ -3,7 +3,7 @@
         <div class="row mb-2">
             <div class="col">
                 <router-link class="btn btn-primary col-sm-5 col-md-4 col-lg-2"
-                             :to="{ name: 'category_create' }"> Создать категорию
+                             :to="{ name: 'given_salary' }">Заплатить зарплату
                 </router-link>
                 <span class="px-3"></span>
                 <input type="text" id="search" class="form-control-sm col-md-4"
@@ -16,23 +16,22 @@
                 <!-- Simple Tables -->
                 <div class="card">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Список категорий</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Зарплаты по месяцам</h6>
                     </div>
                     <div class="table-responsive">
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
                             <tr>
-                                <th>Название</th>
+                                <th>Месяц</th>
                                 <th>Действие</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="category in filtered" :key="category.id">
-                                <td>{{ category.category_name }}</td>
+                            <tr v-for="salary in filtered" :key="salary.id">
+                                <td>{{ salary.salary_month }}</td>
                                 <td>
-                                    <router-link :to="{ name: 'category_edit', params: { id: category.id } }" class="btn btn-sm btn-primary">
-                                        Редактировать</router-link>
-                                    <a @click="categoryDelete(category.id)" class="btn btn-sm btn-danger">Удалить</a>
+                                    <router-link :to="{ name: 'view_salary', params: { id: salary.salary_month } }" class="btn btn-sm btn-primary">
+                                        Смотреть</router-link>
                                 </td>
                             </tr>
                             </tbody>
@@ -49,29 +48,31 @@
 <script>
 export default {
     created() {
-        if (! User.loggedIn() ) {
+        if (!User.loggedIn()) {
             this.$router.push({name: '/'})
         } else
-            this.getCategories()
+            this.getSalaries()
     },
     data() {
         return {
-            categories: [],
+            salaries: [],
             searchBox: '',
         }
     },
     computed: {
         filtered() {
-            const search_str = this.searchBox;
-
+            let search_str = this.searchBox
             if (!search_str) {
-                return this.categories
+                return this.salaries
             }
 
-            return this.categories.filter( (category) => {
-                for (const key in category) {
-                    if (key !== 'id' && category[key]
-                        && category[key].toString().toUpperCase().match(search_str.toUpperCase()) ) {
+            return this.salaries.filter( (salary) => {
+                for (const prop in salary) {
+                    if (prop === 'id') {
+                        continue
+                    }
+                    if (salary[prop] && salary[prop].toString().toUpperCase()
+                        .match(search_str.toUpperCase()) ) {
                         return true
                     }
                 }
@@ -80,23 +81,13 @@ export default {
         },
     },
     methods: {
-        getCategories() {
-            axios.get('api/category')
-                .then( res => {
-                    const tmp = res.data.data
-                    if ( tmp && typeof tmp==='object' ) {
-                        this.categories = res.data.data
-                    } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: "Пришел неверный ответ!",
-                            timer: 5000,
-                        })
-                    }
-                })
+        getSalaries() {
+            axios.get('/api/salary')
+                .then( res => this.salaries = res.data.data )
                 .catch( err => Helper.warn( err.response.data ) )
         },
-        categoryDelete(id) {
+
+        employeeDelete(id) {
             Swal.fire({
                 title: 'Вы уверены?',
                 text: "Вы не сможете отменить операцию!",
@@ -105,17 +96,19 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Да, удалить!',
-            }).then( (res) => {
-                if (res.isConfirmed) {
-                    axios.delete('/api/category/' + id)
+
+            }).then( (result) => {
+
+                if (result.isConfirmed) {
+                    axios.delete('/api/salary/' + id)
                         .then( (res) => {
                             Swal.fire(
-                                'Удалена!',
+                                'Удален!',
                                 res.data.message,
                                 'success'
                             )
-                            this.categories = this.categories.filter( (category) => {
-                                return category.id !== id
+                            this.salaries = this.salaries.filter( (salary) => {
+                                return salary.id !== id
                             })
                         })
                         .catch( err => Helper.warn( err.response.data ) )
@@ -127,5 +120,9 @@ export default {
 </script>
 
 <style scoped>
-
+.photo {
+    max-height: 3rem;
+    max-width: 5rem;
+}
 </style>
+

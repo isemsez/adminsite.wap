@@ -85,7 +85,7 @@ export default {
     methods: {
         createExpense() {
             axios.post('/api/expense', this.form)
-                .then((res) => {
+                .then( res => {
 
                     if (res.status === 201) {
                         this.$router.push({name: 'expense_index'})
@@ -96,17 +96,9 @@ export default {
                         this.errors = {}
                     }
                 })
-                .catch(err => {
+                .catch( err => {
                     this.errors = err.response.data.errors ?? {}
-
-                    const warning = err.response.data.message ?? "Ошибка!";
-                    Toast.fire({
-                        icon: "error",
-                        title: warning,
-                        timer: 5000,
-                    })
-
-                    console.log('-', err.response.data)
+                    Helper.warn( err.response.data )
                 })
         }
     }

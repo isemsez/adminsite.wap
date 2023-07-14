@@ -91,7 +91,7 @@ class ModelCommon extends Model
         return function ($attribute, $value, $fail) {
             if ($value) {
 
-                $photo_mime = explode('/', Image::make($value)->mime());
+                $photo_mime = explode('/', Image::make($value)->mime() );
                 if ($photo_mime[0] != 'image'
                     or !in_array($photo_mime[1],
                         ['jpg', 'jpeg', 'png', 'bmp', 'gif'])) {
@@ -103,7 +103,6 @@ class ModelCommon extends Model
                     $fail('Файл больше 1Мб.');
                 }
             }
-            return true;
         };
     }
 

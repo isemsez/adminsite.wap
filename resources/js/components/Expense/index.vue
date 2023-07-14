@@ -91,14 +91,10 @@ export default {
                     if ( tmp && typeof tmp==='object' ) {
                         this.expenses = res.data.data
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: "Пришел неверный ответ!",
-                            timer: 5000,
-                        })
+                        Toast.fire({ title: "Пришел неверный ответ!" })
                     }
                 })
-                .catch( err => console.log(err.response.data.error))
+                .catch( err => Helper.warn( err.response.data ) )
         },
         expenseDelete(id) {
             Swal.fire({
@@ -122,15 +118,7 @@ export default {
                                 return expense.id !== id
                             })
                         })
-                        .catch( (err) => {
-                            const warning = err.response.data.message
-                            Toast.fire({
-                                icon: "error",
-                                title: warning,
-                                timer: 5000,
-                            })
-                            console.log(err.response.data)
-                        })
+                        .catch( err => Helper.warn( err.response.data ) )
                 }
             })
         },

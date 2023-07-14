@@ -137,16 +137,7 @@ export default {
                     this.form = incoming_data
                 })
                 .catch( err => {
-                    this.errors = err.response.data.errors ?? this.errors
-                    const warning = err.response.data.error ?? "Ошибка!";
-
-                    Toast.fire({
-                        icon: "error",
-                        title: warning,
-                        timer: 5000,
-                    })
-
-                    console.log('-', err.response.data)
+                    Helper.warn( err.response.data )
                 })
         },
         editSupplier() {
@@ -167,16 +158,8 @@ export default {
                     }
                 })
                 .catch( err => {
-                    this.errors = err.response.data.errors ?? this.errors
-                    const warning = err.response.data.message ?? "Ошибка!";
-
-                    Toast.fire({
-                        icon: "error",
-                        title: warning,
-                        timer: 5000,
-                    })
-
-                    console.log('-', err.response.data)
+                    this.errors = err.response.data.errors ?? {}
+                    Helper.warn( err.response.data )
                 })
         },
         onImageSelect(event) {

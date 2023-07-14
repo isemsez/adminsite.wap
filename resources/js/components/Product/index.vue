@@ -95,14 +95,10 @@ export default {
                     if ( tmp && typeof tmp==='object' ) {
                         this.products = res.data.data
                     } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: "Пришел неверный ответ!",
-                            timer: 5000,
-                        })
+                        Toast.fire({ title: "Пришел неверный ответ!", })
                     }
                 })
-                .catch( err => console.log(err.response.data.error))
+                .catch( err => Helper.warn( err.response.data ) )
         },
         productDelete(id) {
             Swal.fire({
@@ -126,15 +122,7 @@ export default {
                                 return product.id !== id
                             })
                         })
-                        .catch( (err) => {
-                            const warning = err.response.data.message
-                            Toast.fire({
-                                icon: "error",
-                                title: warning,
-                                timer: 5000,
-                            })
-                            console.log(err.response.data)
-                        })
+                        .catch( err => Helper.warn( err.response.data ) )
                 }
             })
         },

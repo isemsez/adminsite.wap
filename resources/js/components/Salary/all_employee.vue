@@ -3,7 +3,7 @@
         <div class="row mb-2">
             <div class="col">
                 <router-link class="btn btn-primary col-sm-5 col-md-4 col-lg-2"
-                             :to="{ name: 'category_create' }"> Создать категорию
+                             :to="{ name: 'employee_create' }"> Создать работника
                 </router-link>
                 <span class="px-3"></span>
                 <input type="text" id="search" class="form-control-sm col-md-4"
@@ -16,23 +16,32 @@
                 <!-- Simple Tables -->
                 <div class="card">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Список категорий</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Список работников</h6>
                     </div>
                     <div class="table-responsive">
                         <table class="table align-items-center table-flush">
                             <thead class="thead-light">
                             <tr>
-                                <th>Название</th>
+                                <th>Имя</th>
+                                <th>Фото</th>
+                                <th>Номер телефона</th>
+                                <th>Почта</th>
+                                <th>Зарплата</th>
+                                <th>Устроился(ась) на работу</th>
                                 <th>Действие</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="category in filtered" :key="category.id">
-                                <td>{{ category.category_name }}</td>
+                            <tr v-for="employee in filtered" :key="employee.id">
+                                <td>{{ employee.name }}</td>
+                                <td><img :src="employee.photo" class="photo" alt="photo"></td>
+                                <td>{{ employee.phone }}</td>
+                                <td>{{ employee.email }}</td>
+                                <td>{{ employee.salary }}</td>
+                                <td>{{ (employee.joining_date.split(' '))[0] }}</td>
                                 <td>
-                                    <router-link :to="{ name: 'category_edit', params: { id: category.id } }" class="btn btn-sm btn-primary">
-                                        Редактировать</router-link>
-                                    <a @click="categoryDelete(category.id)" class="btn btn-sm btn-danger">Удалить</a>
+                                    <router-link :to="{ name: 'pay_salary', params: { id: employee.id } }" class="btn btn-sm btn-primary">
+                                        К оплате</router-link>
                                 </td>
                             </tr>
                             </tbody>
@@ -49,29 +58,31 @@
 <script>
 export default {
     created() {
-        if (! User.loggedIn() ) {
+        if (!User.loggedIn()) {
             this.$router.push({name: '/'})
         } else
-            this.getCategories()
+            this.getEmployees()
     },
     data() {
         return {
-            categories: [],
+            employees: [],
             searchBox: '',
         }
     },
     computed: {
         filtered() {
-            const search_str = this.searchBox;
-
+            let search_str = this.searchBox
             if (!search_str) {
-                return this.categories
+                return this.employees
             }
 
-            return this.categories.filter( (category) => {
-                for (const key in category) {
-                    if (key !== 'id' && category[key]
-                        && category[key].toString().toUpperCase().match(search_str.toUpperCase()) ) {
+            return this.employees.filter( (employee) => {
+                for (const prop in employee) {
+                    if (prop === 'id' || prop === 'photo') {
+                        continue
+                    }
+                    if (employee[prop] && employee[prop].toString().toUpperCase()
+                        .match(search_str.toUpperCase()) ) {
                         return true
                     }
                 }
@@ -80,23 +91,14 @@ export default {
         },
     },
     methods: {
-        getCategories() {
-            axios.get('api/category')
-                .then( res => {
-                    const tmp = res.data.data
-                    if ( tmp && typeof tmp==='object' ) {
-                        this.categories = res.data.data
-                    } else {
-                        Toast.fire({
-                            icon: "error",
-                            title: "Пришел неверный ответ!",
-                            timer: 5000,
-                        })
-                    }
-                })
+        getEmployees() {
+            axios.get('/api/employee')
+
+                .then( res => this.employees = res.data.data )
                 .catch( err => Helper.warn( err.response.data ) )
         },
-        categoryDelete(id) {
+
+        employeeDelete(id) {
             Swal.fire({
                 title: 'Вы уверены?',
                 text: "Вы не сможете отменить операцию!",
@@ -105,17 +107,19 @@ export default {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Да, удалить!',
-            }).then( (res) => {
-                if (res.isConfirmed) {
-                    axios.delete('/api/category/' + id)
+
+            }).then( (result) => {
+
+                if (result.isConfirmed) {
+                    axios.delete('/api/employee/' + id)
                         .then( (res) => {
                             Swal.fire(
-                                'Удалена!',
+                                'Удален!',
                                 res.data.message,
                                 'success'
                             )
-                            this.categories = this.categories.filter( (category) => {
-                                return category.id !== id
+                            this.employees = this.employees.filter( (employee) => {
+                                return employee.id !== id
                             })
                         })
                         .catch( err => Helper.warn( err.response.data ) )
@@ -127,5 +131,9 @@ export default {
 </script>
 
 <style scoped>
-
+.photo {
+    max-height: 3rem;
+    max-width: 5rem;
+}
 </style>
+

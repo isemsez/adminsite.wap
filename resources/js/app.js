@@ -19,6 +19,7 @@ window.Swal = Swal
 const Toast = Swal.mixin({
     toast: true,
     position: 'top',
+    icon: "error",
     showConfirmButton: false,
     timer: 5000,
     timerProgressBar: true,
@@ -32,6 +33,8 @@ window.Toast = Toast
 import Notification from "./Helpers/Notification";
 window.Notification = Notification
 
+import Helper from './Helpers/Helper'
+window.Helper = Helper
 
 const app = new Vue({
     el: '#app',
